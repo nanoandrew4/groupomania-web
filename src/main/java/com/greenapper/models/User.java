@@ -11,6 +11,7 @@ import java.util.Set;
 @Inheritance(
 		strategy = InheritanceType.JOINED
 )
+@Table(name = "Users")
 public abstract class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
