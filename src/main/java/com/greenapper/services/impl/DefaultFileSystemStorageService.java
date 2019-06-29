@@ -50,7 +50,7 @@ public class DefaultFileSystemStorageService implements FileSystemStorageService
 
 	@Override
 	public String saveImage(final MultipartFile image) {
-		if (image.getSize() > 0) {
+		if (image != null && image.getSize() > 0) {
 			final String contentType = Objects.requireNonNull(image.getContentType()).replace("image/", "");
 			String relativeStoragePath = "";
 			try {

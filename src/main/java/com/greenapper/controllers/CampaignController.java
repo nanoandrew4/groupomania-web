@@ -119,7 +119,10 @@ public class CampaignController {
 			LOG.error("An error occurred while trying to get the service for the supplied campaign", e);
 			errors.reject("err.campaign.type");
 		}
-		return getPageForCampaignType(campaignForm.getType().displayName);
+		if (campaignForm.getType() != null)
+			return getPageForCampaignType(campaignForm.getType().displayName);
+		else
+			return getPageForCampaignType("offer");
 	}
 
 	/**
@@ -134,7 +137,7 @@ public class CampaignController {
 		final List<Campaign> campaigns = campaignService.getAllCampaigns();
 
 		campaigns.removeIf(campaign -> campaign.getState() == CampaignState.INACTIVE);
-		campaigns.removeIf(campaign -> campaign.isShowAfterExpiration() && LocalDate.now().plus(4, ChronoUnit.DAYS).isAfter(campaign.getEndDate()));
+		campaigns.removeIf(campaign -> campaign.isShowAfterExpiration() && LocalDate.now().isAfter(campaign.getEndDate().plus(4, ChronoUnit.DAYS)));
 		campaigns.removeIf(campaign -> !campaign.isShowAfterExpiration() && LocalDate.now().isAfter(campaign.getEndDate()));
 
 		model.addAttribute("campaigns", campaigns);

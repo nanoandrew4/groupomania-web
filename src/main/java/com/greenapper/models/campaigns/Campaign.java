@@ -73,7 +73,7 @@ public abstract class Campaign {
 	private Double parseDouble(final String str) {
 		try {
 			return Double.valueOf(str);
-		} catch (NumberFormatException e) {
+		} catch (NumberFormatException | NullPointerException e) {
 			return null;
 		}
 	}

@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
@@ -23,6 +24,7 @@ import static org.junit.Assert.*;
 		webEnvironment = SpringBootTest.WebEnvironment.MOCK,
 		classes = Main.class
 )
+@TestPropertySource(locations = "classpath:application-test.properties")
 public class CampaignManagerIntegrationTest {
 	@Autowired
 	private CampaignManagerController campaignManagerController;
@@ -34,6 +36,7 @@ public class CampaignManagerIntegrationTest {
 	private SessionService sessionService;
 
 	@Before
+//	@Sql("../data-h2.sql")
 	public void setup() {
 		final CampaignManager campaignManager = campaignManagerService.getByUsername("admin").orElse(null);
 

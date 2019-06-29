@@ -34,7 +34,7 @@ public class CampaignFormValidator implements Validator {
 	public static Double parseDouble(final String doubleStr) {
 		try {
 			return Double.valueOf(doubleStr);
-		} catch (NumberFormatException e) {
+		} catch (NumberFormatException | NullPointerException e) {
 			return null;
 		}
 	}
@@ -64,7 +64,7 @@ public class CampaignFormValidator implements Validator {
 	private static LocalDate parseDate(final String date) {
 		try {
 			return LocalDate.parse(date);
-		} catch (DateTimeParseException e) {
+		} catch (DateTimeParseException | NullPointerException e) {
 			return null;
 		}
 	}
@@ -123,7 +123,8 @@ public class CampaignFormValidator implements Validator {
 		rejectDateIfEmptyOrBeforeNow(campaignForm.getEndDate(), "err.campaign.endDate", errors);
 		rejectDateIfEqualOrAfterOtherDate(campaignForm.getStartDate(), campaignForm.getEndDate(), "err.campaign.startDateAfterEndDate", errors);
 
-		if (campaignForm.getCampaignImage().getSize() > 0 && (campaignForm.getCampaignImage().getContentType() == null || !campaignForm.getCampaignImage().getContentType().contains("image")))
+		if (campaignForm.getCampaignImage() != null && campaignForm.getCampaignImage().getSize() > 0 &&
+			(campaignForm.getCampaignImage().getContentType() == null || !campaignForm.getCampaignImage().getContentType().contains("image")))
 			errors.reject("err.campaign.imageFormat");
 
 		final Double discountedPrice = parseDouble(campaignForm.getDiscountedPrice());

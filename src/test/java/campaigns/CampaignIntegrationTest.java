@@ -2,6 +2,7 @@ package campaigns;
 
 import com.greenapper.Main;
 import com.greenapper.controllers.CampaignController;
+import com.greenapper.enums.CampaignState;
 import com.greenapper.enums.CampaignType;
 import com.greenapper.forms.campaigns.CampaignForm;
 import com.greenapper.forms.campaigns.OfferCampaignForm;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -35,6 +37,7 @@ import static org.junit.Assert.*;
 		webEnvironment = SpringBootTest.WebEnvironment.MOCK,
 		classes = Main.class
 )
+@TestPropertySource(locations = "classpath:application-test.properties")
 public class CampaignIntegrationTest {
 
 	@Autowired
@@ -67,7 +70,7 @@ public class CampaignIntegrationTest {
 		final String ret = campaignController.getCampaignUpdateForm(model, "Offer");
 
 		assertEquals("campaigns/offerCampaign", ret);
-		assertEquals(CampaignType.OFFER, ((CampaignForm) model.asMap().get("campaign")).getType());
+		assertEquals(CampaignType.OFFER, ((CampaignForm) model.asMap().get("campaignForm")).getType());
 	}
 
 	@Test
@@ -76,7 +79,7 @@ public class CampaignIntegrationTest {
 		final String ret = campaignController.getCampaignUpdateForm(model, "Coupon");
 
 		assertEquals("campaigns/couponCampaign", ret);
-		assertEquals(CampaignType.COUPON, ((CampaignForm) model.asMap().get("campaign")).getType());
+		assertEquals(CampaignType.COUPON, ((CampaignForm) model.asMap().get("campaignForm")).getType());
 	}
 
 	@Test
@@ -142,7 +145,7 @@ public class CampaignIntegrationTest {
 		campaign.setOriginalPrice("-1");
 		final String ret = campaignController.updateCampaign(campaign, errors);
 
-		performStandardKOAssertions(errors, Collections.singletonList("err.campaign.originalPrice"), ret);
+		performStandardKOAssertions(errors, Lists.newArrayList("err.campaign.originalPrice", "err.campaign.discountedPriceLargerThanOriginal"), ret);
 	}
 
 	@Test
@@ -221,7 +224,7 @@ public class CampaignIntegrationTest {
 		campaign.setPercentDiscount(null);
 		final String ret = campaignController.updateCampaign(campaign, errors);
 
-		performStandardKOAssertions(errors, Collections.singletonList("err.campaign.discountedPriceOrPercent"), ret);
+		performStandardKOAssertions(errors, Collections.singletonList("err.campaign.offer.discountedPriceOrPercent"), ret);
 	}
 
 	@Test
@@ -257,6 +260,7 @@ public class CampaignIntegrationTest {
 		campaign.setEndDate(String.valueOf(LocalDate.now().plus(5, ChronoUnit.DAYS)));
 		campaign.setOriginalPrice("1");
 		campaign.setDiscountedPrice("0.5");
+		campaign.setState(CampaignState.INACTIVE);
 
 		return campaign;
 	}
