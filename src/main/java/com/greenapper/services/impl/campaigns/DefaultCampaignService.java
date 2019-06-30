@@ -1,6 +1,7 @@
 package com.greenapper.services.impl.campaigns;
 
 import com.greenapper.enums.CampaignState;
+import com.greenapper.factories.CampaignFactory;
 import com.greenapper.forms.campaigns.CampaignForm;
 import com.greenapper.models.CampaignManager;
 import com.greenapper.models.campaigns.Campaign;
@@ -14,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.Errors;
 
-import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +33,9 @@ public abstract class DefaultCampaignService implements CampaignService {
 	@Autowired
 	private FileSystemStorageService fileSystemStorageService;
 
+	@Autowired
+	private CampaignFactory campaignFactory;
+
 	private Logger LOG = LoggerFactory.getLogger(this.getClass());
 
 	public DefaultCampaignService() {
@@ -43,7 +46,7 @@ public abstract class DefaultCampaignService implements CampaignService {
 	public void createCampaign(final CampaignForm campaignForm, final Errors errors) {
 		validateCampaign(campaignForm, errors);
 		if (!errors.hasErrors()) {
-			createCampaignFromForm(campaignForm).ifPresent(campaign -> {
+			campaignFactory.createCampaignModel(campaignForm).ifPresent(campaign -> {
 				campaign.setOwner(getSessionCampaignManager());
 				campaign.setState(CampaignState.INACTIVE);
 				setDefaultsForCampaignSubtype(campaign);
@@ -56,7 +59,7 @@ public abstract class DefaultCampaignService implements CampaignService {
 	public void editCampaign(final CampaignForm campaignForm, final Errors errors) {
 		validateCampaign(campaignForm, errors);
 		if (!errors.hasErrors()) {
-			createCampaignFromForm(campaignForm).ifPresent(campaign -> {
+			campaignFactory.createCampaignModel(campaignForm).ifPresent(campaign -> {
 				campaign.setOwner(getSessionCampaignManager());
 				saveCampaign(campaign, campaignForm);
 			});
@@ -97,24 +100,6 @@ public abstract class DefaultCampaignService implements CampaignService {
 	@Override
 	public List<Campaign> getAllCampaignsForCurrentUser() {
 		return getSessionCampaignManager().getCampaigns();
-	}
-
-	/**
-	 * Creates a {@link Campaign} subclass from a {@link CampaignForm} subclass, through the use of reflection.
-	 * The created campaign will be of the same type as the supplied campaign form.
-	 *
-	 * @param campaignForm Campaign form from which to create the campaign model
-	 * @return The newly created campaign model wrapped in an optional, or an empty optional if reflection failed
-	 */
-	private Optional<Campaign> createCampaignFromForm(final CampaignForm campaignForm) {
-		try {
-			final String fullClassName = Campaign.class.getPackage().getName() + "." + campaignForm.getType().displayName + "Campaign";
-			final String formClassName = CampaignForm.class.getPackage().getName() + "." + campaignForm.getType().displayName + "CampaignForm";
-			return Optional.of((Campaign) Class.forName(fullClassName).getConstructor(Class.forName(formClassName)).newInstance(campaignForm));
-		} catch (ClassNotFoundException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
-			LOG.error("Could not create campaign model for type: \'" + campaignForm.getType().displayName + "\'", e);
-			return Optional.empty();
-		}
 	}
 
 	/**

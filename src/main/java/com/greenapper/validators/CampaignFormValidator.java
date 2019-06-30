@@ -114,7 +114,7 @@ public class CampaignFormValidator implements Validator {
 
 		rejectStringIfEmptyOrTooLong(campaignForm.getTitle(), "err.campaign.title", errors);
 		rejectStringIfEmptyOrTooLong(campaignForm.getDescription(), "err.campaign.description", errors);
-		rejectStringIfEmptyOrTooLong(campaignForm.getType().toString(), "err.campaign.type", errors);
+		rejectIfNull(campaignForm.getType(), "err.campaign.type", errors);
 		rejectIfNumberNullOrNegative(campaignForm.getQuantity(), "err.campaign.quantity", errors);
 		rejectIfNumberNullOrNegative(campaignForm.getOriginalPrice(), "err.campaign.originalPrice", errors);
 		rejectIfNumberPresentAndInvalid(campaignForm.getPercentDiscount(), "err.campaign.percentDiscount", errors);

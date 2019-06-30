@@ -2,12 +2,15 @@ package com.greenapper.controllers.campaign;
 
 import com.greenapper.controllers.CampaignManagerController;
 import com.greenapper.enums.CampaignState;
+import com.greenapper.exceptions.InvalidCampaignTypeException;
+import com.greenapper.exceptions.NoSuchCampaignException;
+import com.greenapper.factories.CampaignFormFactory;
 import com.greenapper.forms.campaigns.CampaignForm;
 import com.greenapper.models.campaigns.Campaign;
 import com.greenapper.services.CampaignService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Contains all endpoints related to campaigns which have no direct relation to the session user whatsoever.
@@ -23,13 +27,14 @@ import java.util.List;
  */
 public abstract class BaseCampaignController {
 
+	@Autowired
+	private CampaignFormFactory campaignFormFactory;
+
 	private Logger LOG = LoggerFactory.getLogger(BaseCampaignController.class);
 
 	public static final String CAMPAIGN_CREATION_SUCCESS_REDIRECT = "redirect:" + CampaignManagerController.CAMPAIGNS_OVERVIEW_URI;
 
 	abstract CampaignService getCampaignService();
-
-	abstract CampaignForm createFormFromModel(final Campaign campaign);
 
 	/**
 	 * Retrieves a campaign by ID, and sets a flag to indicate to the frontend that the accompanying form should be
@@ -40,22 +45,11 @@ public abstract class BaseCampaignController {
 	 * @return Thymeleaf page to load with the returned data
 	 */
 	public String getCampaignById(final Model model, @PathVariable final Long id) {
-		final CampaignForm campaignForm = createFormFromModel(getCampaignService().getCampaignById(id));
-		model.addAttribute("campaignForm", campaignForm);
+		final Optional<CampaignForm> campaignForm = campaignFormFactory.createCampaignForm(getCampaignService().getCampaignById(id));
+		model.addAttribute("campaignForm", campaignForm.orElse(null));
 		model.addAttribute("readonly", true);
 
-		return getPageForCampaignType(campaignForm.getType().displayName.toLowerCase());
-	}
-
-	/**
-	 * Retrieves the campaign creation/update form, and attaches it to the model.
-	 *
-	 * @param model Model to which the form will be attached
-	 * @param campaignForm
-	 * @return The appropriate page for the campaign type, or the page for offer campaigns if the type sent was invalid
-	 */
-	public String getCampaignUpdateForm(final Model model, final CampaignForm campaignForm) {
-		return getPageForCampaignType(campaignForm.getType().displayName.toLowerCase());
+		return getPageForCampaignType(campaignForm.orElseThrow(() -> new NoSuchCampaignException(id)).getType().displayName.toLowerCase());
 	}
 
 	/**
@@ -72,22 +66,20 @@ public abstract class BaseCampaignController {
 	 * the corresponding page for the type of campaign that was sent, alongside the errors that were encountered during validation
 	 */
 	public String updateCampaign(final CampaignForm campaignForm, final Errors errors) {
-		try {
-			if (campaignForm.getId() == null)
-				getCampaignService().createCampaign(campaignForm, errors);
-			else
-				getCampaignService().editCampaign(campaignForm, errors);
+		if (campaignForm == null)
+			throw new NoSuchCampaignException();
 
-			if (!errors.hasErrors())
-				return CAMPAIGN_CREATION_SUCCESS_REDIRECT;
-		} catch (NoSuchBeanDefinitionException | NullPointerException e) {
-			LOG.error("An error occurred while trying to get the service for the supplied campaign", e);
-			errors.reject("err.campaign.type");
-		}
+		if (campaignForm.getId() == null)
+			getCampaignService().createCampaign(campaignForm, errors);
+		else
+			getCampaignService().editCampaign(campaignForm, errors);
+
+		if (!errors.hasErrors())
+			return CAMPAIGN_CREATION_SUCCESS_REDIRECT;
+
 		if (campaignForm.getType() != null)
 			return getPageForCampaignType(campaignForm.getType().displayName);
-		else
-			return getPageForCampaignType("offer");
+		throw new InvalidCampaignTypeException(campaignForm.getId(), campaignForm.getType());
 	}
 
 	/**

@@ -2,6 +2,7 @@ package com.greenapper.controllers;
 
 import com.greenapper.controllers.campaign.BaseCampaignController;
 import com.greenapper.controllers.campaign.OfferCampaignController;
+import com.greenapper.factories.CampaignFormFactory;
 import com.greenapper.forms.PasswordUpdateForm;
 import com.greenapper.forms.campaigns.CampaignForm;
 import com.greenapper.models.CampaignManager;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.function.Predicate;
 
 /**
@@ -53,6 +53,9 @@ public class CampaignManagerController {
 
 	@Autowired
 	private CampaignManagerService campaignManagerService;
+
+	@Autowired
+	private CampaignFormFactory campaignFormFactory;
 
 	/**
 	 * Retrieves the password update page.
@@ -109,14 +112,8 @@ public class CampaignManagerController {
 		final Campaign campaign = campaignManagerService.getCampaigns().stream().filter(findById).findFirst().orElse(null);
 
 		if (campaign != null) {
-			try {
-				final Class<?> campaignModel = Class.forName(Campaign.class.getPackage().getName() + "." + campaign.getType().displayName + "Campaign");
-				final CampaignForm campaignForm = (CampaignForm) Class.forName(CampaignForm.class.getPackage().getName() + "." + campaign.getType().displayName + "CampaignForm").getConstructor(campaignModel).newInstance(campaign);
-				model.addAttribute("campaignForm", campaignForm);
-				return BaseCampaignController.getPageForCampaignType(campaign.getType().displayName);
-			} catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
-				LOG.error("Error creating campaign form for type: \'" + campaign.getType().displayName + "\'", e);
-			}
+			model.addAttribute("campaignForm", campaignFormFactory.createCampaignForm(campaign));
+			return BaseCampaignController.getPageForCampaignType(campaign.getType().displayName);
 		}
 
 		return OfferCampaignController.CAMPAIGN_CREATION_URI;

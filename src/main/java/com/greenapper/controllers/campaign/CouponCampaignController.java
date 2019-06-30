@@ -1,9 +1,6 @@
 package com.greenapper.controllers.campaign;
 
-import com.greenapper.forms.campaigns.CampaignForm;
 import com.greenapper.forms.campaigns.CouponCampaignForm;
-import com.greenapper.models.campaigns.Campaign;
-import com.greenapper.models.campaigns.CouponCampaign;
 import com.greenapper.services.CampaignService;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
@@ -28,11 +25,6 @@ public class CouponCampaignController extends BaseCampaignController {
 	@Override
 	CampaignService getCampaignService() {
 		return couponCampaignService;
-	}
-
-	@Override
-	CampaignForm createFormFromModel(Campaign campaign) {
-		return new CouponCampaignForm((CouponCampaign) campaign);
 	}
 
 	@GetMapping(CAMPAIGN_CREATION_URI)

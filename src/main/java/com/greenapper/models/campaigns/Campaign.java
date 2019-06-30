@@ -17,7 +17,7 @@ import java.time.LocalDate;
 @Inheritance(
 		strategy = InheritanceType.JOINED
 )
-public abstract class Campaign {
+public class Campaign {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -52,7 +52,7 @@ public abstract class Campaign {
 
 	private CampaignState state;
 
-	public Campaign() {}
+	protected Campaign() {}
 
 	public Campaign(final CampaignForm campaignForm) {
 		this.id = campaignForm.getId();
