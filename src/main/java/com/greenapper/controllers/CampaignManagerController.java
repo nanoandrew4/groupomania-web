@@ -1,5 +1,7 @@
 package com.greenapper.controllers;
 
+import com.greenapper.controllers.campaign.BaseCampaignController;
+import com.greenapper.controllers.campaign.OfferCampaignController;
 import com.greenapper.forms.PasswordUpdateForm;
 import com.greenapper.forms.campaigns.CampaignForm;
 import com.greenapper.models.CampaignManager;
@@ -42,7 +44,7 @@ public class CampaignManagerController {
 
 	public final static String CAMPAIGNS_OVERVIEW_FORM = "campaign_manager/campaignsOverview";
 
-	public final static String PASSWORD_UPDATE_SUCCESS_REDIRECT = "redirect:" + CampaignController.CAMPAIGNS_OVERVIEW_URI;
+	public final static String PASSWORD_UPDATE_SUCCESS_REDIRECT = "redirect:" + CAMPAIGNS_OVERVIEW_URI;
 
 	private Logger LOG = LoggerFactory.getLogger(CampaignManagerController.class);
 
@@ -111,13 +113,13 @@ public class CampaignManagerController {
 				final Class<?> campaignModel = Class.forName(Campaign.class.getPackage().getName() + "." + campaign.getType().displayName + "Campaign");
 				final CampaignForm campaignForm = (CampaignForm) Class.forName(CampaignForm.class.getPackage().getName() + "." + campaign.getType().displayName + "CampaignForm").getConstructor(campaignModel).newInstance(campaign);
 				model.addAttribute("campaignForm", campaignForm);
-				return CampaignController.getPageForCampaignType(campaign.getType().displayName);
+				return BaseCampaignController.getPageForCampaignType(campaign.getType().displayName);
 			} catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
 				LOG.error("Error creating campaign form for type: \'" + campaign.getType().displayName + "\'", e);
 			}
 		}
 
-		return CampaignController.CAMPAIGN_CREATION_DEFAULT_REDIRECTION;
+		return OfferCampaignController.CAMPAIGN_CREATION_URI;
 	}
 
 	/**

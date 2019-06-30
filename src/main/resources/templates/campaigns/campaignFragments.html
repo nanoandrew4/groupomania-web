@@ -14,20 +14,22 @@
 </head>
 <body>
 
-<form action="#" th:action="@{${T(com.greenapper.controllers.CampaignController).CAMPAIGN_CREATION_URI}}"
-      th:fragment="campaignTypeChange" th:method="get" th:object="${campaignForm}">
-    <div class="text-center">
-        <label th:text="#{campaign.type}">Campaign type</label>
-        <select id="type" name="type" onchange="this.form.submit()"
-                th:attrappend="disabled=${campaignForm.id != null} ? 'disabled' : ''">
-            <option th:each="campaignType : ${T(com.greenapper.enums.CampaignType).values()}"
-                    th:selected="${campaignType.displayName} == *{type.displayName}"
-                    th:text="${campaignType.displayName}"
-                    th:value="${campaignType.displayName}">CampaignType
-            </option>
-        </select>
+<div th:fragment="campaignTypeDropdown" class="text-center" th:object="${campaignForm}">
+    <label th:text="#{campaign.type}">Campaign type</label>
+    <div class="dropdown btn-group">
+        <button class="btn btn-link dropdown-toggle" type="button" id="languageMenu"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <label class="text-secondary" th:text="*{type.displayName}"></label>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="languageMenu">
+            <li th:each="campaignType : ${T(com.greenapper.enums.CampaignType).values()}">
+                <a th:href="@{'/campaigns/'+ ${#strings.toLowerCase(campaignType)} + '/create'}"
+                   th:text="${campaignType.displayName}"></a>
+            </li>
+        </ul>
     </div>
-</form>
+</div>
 
 <div class="form-group" th:fragment="campaignFields">
     <div hidden="hidden">
@@ -38,6 +40,9 @@
     </div>
     <div hidden="hidden">
         <input class="form-control" th:field="*{campaignImageFilePath}"/>
+    </div>
+    <div hidden="hidden">
+        <input class="form-control" th:field="*{type}" th:attrappend="readonly=${readonly != null} ? 'readonly' : ''"/>
     </div>
     <div class="form-group">
         <label th:text="#{campaign.title}">Title</label>
@@ -81,9 +86,6 @@
         <label th:text="#{campaign.quantity}">Available quantity</label>
         <input class="form-control" th:field="*{quantity}"
                th:attrappend="readonly=${readonly != null} ? 'readonly' : ''"/>
-    </div>
-    <div hidden="hidden">
-        <input class="form-control" th:field="*{type}" th:attrappend="readonly=${readonly != null} ? 'readonly' : ''"/>
     </div>
     <div class="form-group">
         <label th:text="#{campaign.showAfterExpiration}">Show after expiration</label>

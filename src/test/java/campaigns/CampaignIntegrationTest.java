@@ -1,10 +1,13 @@
 package campaigns;
 
 import com.greenapper.Main;
-import com.greenapper.controllers.CampaignController;
+import com.greenapper.controllers.campaign.BaseCampaignController;
+import com.greenapper.controllers.campaign.CouponCampaignController;
+import com.greenapper.controllers.campaign.OfferCampaignController;
 import com.greenapper.enums.CampaignState;
 import com.greenapper.enums.CampaignType;
 import com.greenapper.forms.campaigns.CampaignForm;
+import com.greenapper.forms.campaigns.CouponCampaignForm;
 import com.greenapper.forms.campaigns.OfferCampaignForm;
 import com.greenapper.models.CampaignManager;
 import com.greenapper.models.User;
@@ -41,7 +44,13 @@ import static org.junit.Assert.*;
 public class CampaignIntegrationTest {
 
 	@Autowired
-	private CampaignController campaignController;
+	private BaseCampaignController baseCampaignController;
+
+	@Autowired
+	private OfferCampaignController offerCampaignController;
+
+	@Autowired
+	private CouponCampaignController couponCampaignController;
 
 	@Autowired
 	private SessionService sessionService;
@@ -57,17 +66,9 @@ public class CampaignIntegrationTest {
 	}
 
 	@Test
-	public void getCampaignCreationFormWithEmptyTypeParam() {
-		final Model model = new BindingAwareModelMap();
-		final String ret = campaignController.getCampaignUpdateForm(model, "");
-
-		assertEquals(CampaignController.CAMPAIGN_CREATION_DEFAULT_REDIRECTION, ret);
-	}
-
-	@Test
 	public void getCampaignCreationFormForOfferType() {
 		final Model model = new BindingAwareModelMap();
-		final String ret = campaignController.getCampaignUpdateForm(model, "Offer");
+		final String ret = offerCampaignController.getCampaignUpdateForm(new OfferCampaignForm());
 
 		assertEquals("campaigns/offerCampaign", ret);
 		assertEquals(CampaignType.OFFER, ((CampaignForm) model.asMap().get("campaignForm")).getType());
@@ -76,7 +77,7 @@ public class CampaignIntegrationTest {
 	@Test
 	public void getCampaignCreationFormForCouponType() {
 		final Model model = new BindingAwareModelMap();
-		final String ret = campaignController.getCampaignUpdateForm(model, "Coupon");
+		final String ret = couponCampaignController.getCampaignUpdateForm(new CouponCampaignForm());
 
 		assertEquals("campaigns/couponCampaign", ret);
 		assertEquals(CampaignType.COUPON, ((CampaignForm) model.asMap().get("campaignForm")).getType());
@@ -88,7 +89,7 @@ public class CampaignIntegrationTest {
 		final Errors errors = new BeanPropertyBindingResult(campaign, "campaign");
 
 		campaign.setTitle(null);
-		final String ret = campaignController.updateCampaign(campaign, errors);
+		final String ret = baseCampaignController.updateCampaign(campaign, errors);
 
 		performStandardKOAssertions(errors, Collections.singletonList("err.campaign.title"), ret);
 	}
@@ -99,7 +100,7 @@ public class CampaignIntegrationTest {
 		final Errors errors = new BeanPropertyBindingResult(campaign, "campaign");
 
 		campaign.setDescription(null);
-		final String ret = campaignController.updateCampaign(campaign, errors);
+		final String ret = baseCampaignController.updateCampaign(campaign, errors);
 
 		performStandardKOAssertions(errors, Collections.singletonList("err.campaign.description"), ret);
 	}
@@ -110,7 +111,7 @@ public class CampaignIntegrationTest {
 		final Errors errors = new BeanPropertyBindingResult(campaign, "campaign");
 
 		campaign.setType(null);
-		final String ret = campaignController.updateCampaign(campaign, errors);
+		final String ret = baseCampaignController.updateCampaign(campaign, errors);
 
 		performStandardKOAssertions(errors, Collections.singletonList("err.campaign.type"), ret);
 	}
@@ -121,7 +122,7 @@ public class CampaignIntegrationTest {
 		final Errors errors = new BeanPropertyBindingResult(campaign, "campaign");
 
 		campaign.setQuantity("-1");
-		final String ret = campaignController.updateCampaign(campaign, errors);
+		final String ret = baseCampaignController.updateCampaign(campaign, errors);
 
 		performStandardKOAssertions(errors, Collections.singletonList("err.campaign.quantity"), ret);
 	}
@@ -132,7 +133,7 @@ public class CampaignIntegrationTest {
 		final Errors errors = new BeanPropertyBindingResult(campaign, "campaign");
 
 		campaign.setOriginalPrice(null);
-		final String ret = campaignController.updateCampaign(campaign, errors);
+		final String ret = baseCampaignController.updateCampaign(campaign, errors);
 
 		performStandardKOAssertions(errors, Collections.singletonList("err.campaign.originalPrice"), ret);
 	}
@@ -143,7 +144,7 @@ public class CampaignIntegrationTest {
 		final Errors errors = new BeanPropertyBindingResult(campaign, "campaign");
 
 		campaign.setOriginalPrice("-1");
-		final String ret = campaignController.updateCampaign(campaign, errors);
+		final String ret = baseCampaignController.updateCampaign(campaign, errors);
 
 		performStandardKOAssertions(errors, Lists.newArrayList("err.campaign.originalPrice", "err.campaign.discountedPriceLargerThanOriginal"), ret);
 	}
@@ -154,7 +155,7 @@ public class CampaignIntegrationTest {
 		final Errors errors = new BeanPropertyBindingResult(campaign, "campaign");
 
 		campaign.setStartDate(null);
-		final String ret = campaignController.updateCampaign(campaign, errors);
+		final String ret = baseCampaignController.updateCampaign(campaign, errors);
 
 		performStandardKOAssertions(errors, Collections.singletonList("err.campaign.startDate"), ret);
 	}
@@ -165,7 +166,7 @@ public class CampaignIntegrationTest {
 		final Errors errors = new BeanPropertyBindingResult(campaign, "campaign");
 
 		campaign.setStartDate(String.valueOf(LocalDate.now().minus(5, ChronoUnit.DAYS)));
-		final String ret = campaignController.updateCampaign(campaign, errors);
+		final String ret = baseCampaignController.updateCampaign(campaign, errors);
 
 		performStandardKOAssertions(errors, Collections.singletonList("err.campaign.startDate"), ret);
 	}
@@ -176,7 +177,7 @@ public class CampaignIntegrationTest {
 		final Errors errors = new BeanPropertyBindingResult(campaign, "campaign");
 
 		campaign.setEndDate(null);
-		final String ret = campaignController.updateCampaign(campaign, errors);
+		final String ret = baseCampaignController.updateCampaign(campaign, errors);
 
 		performStandardKOAssertions(errors, Collections.singletonList("err.campaign.endDate"), ret);
 	}
@@ -187,7 +188,7 @@ public class CampaignIntegrationTest {
 		final Errors errors = new BeanPropertyBindingResult(campaign, "campaign");
 
 		campaign.setEndDate(String.valueOf(LocalDate.now().minus(5, ChronoUnit.DAYS)));
-		final String ret = campaignController.updateCampaign(campaign, errors);
+		final String ret = baseCampaignController.updateCampaign(campaign, errors);
 
 		final List<String> expectedErrorCodes = Lists.newArrayList("err.campaign.endDate", "err.campaign.startDateAfterEndDate");
 		performStandardKOAssertions(errors, expectedErrorCodes, ret);
@@ -199,7 +200,7 @@ public class CampaignIntegrationTest {
 		final Errors errors = new BeanPropertyBindingResult(campaign, "campaign");
 
 		campaign.setStartDate(String.valueOf(LocalDate.parse(campaign.getEndDate()).plus(5, ChronoUnit.DAYS)));
-		final String ret = campaignController.updateCampaign(campaign, errors);
+		final String ret = baseCampaignController.updateCampaign(campaign, errors);
 
 		performStandardKOAssertions(errors, Collections.singletonList("err.campaign.startDateAfterEndDate"), ret);
 	}
@@ -210,7 +211,7 @@ public class CampaignIntegrationTest {
 		final Errors errors = new BeanPropertyBindingResult(campaign, "campaign");
 
 		campaign.setEndDate(campaign.getStartDate());
-		final String ret = campaignController.updateCampaign(campaign, errors);
+		final String ret = baseCampaignController.updateCampaign(campaign, errors);
 
 		performStandardKOAssertions(errors, Collections.singletonList("err.campaign.startDateAfterEndDate"), ret);
 	}
@@ -222,7 +223,7 @@ public class CampaignIntegrationTest {
 
 		campaign.setDiscountedPrice(null);
 		campaign.setPercentDiscount(null);
-		final String ret = campaignController.updateCampaign(campaign, errors);
+		final String ret = baseCampaignController.updateCampaign(campaign, errors);
 
 		performStandardKOAssertions(errors, Collections.singletonList("err.campaign.offer.discountedPriceOrPercent"), ret);
 	}
@@ -233,16 +234,16 @@ public class CampaignIntegrationTest {
 		final CampaignForm campaign = getMinimalCampaign();
 		final Errors errors = new BeanPropertyBindingResult(campaign, "campaign");
 
-		final String ret = campaignController.updateCampaign(campaign, errors);
+		final String ret = baseCampaignController.updateCampaign(campaign, errors);
 
 		assertFalse(errors.hasErrors());
-		assertEquals(CampaignController.CAMPAIGN_CREATION_SUCCESS_REDIRECT, ret);
+		assertEquals(BaseCampaignController.CAMPAIGN_CREATION_SUCCESS_REDIRECT, ret);
 
 		assertFalse(((CampaignManager) sessionService.getSessionUser()).getCampaigns().isEmpty());
 	}
 
 	private void performStandardKOAssertions(final Errors errors, final List<String> expectedErrorCodes, final String actualReturnString) {
-		assertEquals(CampaignController.getPageForCampaignType("offer"), actualReturnString);
+		assertEquals(BaseCampaignController.getPageForCampaignType("offer"), actualReturnString);
 		assertEquals(expectedErrorCodes.size(), errors.getErrorCount());
 		for (String errorCode : expectedErrorCodes)
 			assertTrue(errors.getAllErrors().stream().map(DefaultMessageSourceResolvable::getCode).anyMatch(errorCode::equals));

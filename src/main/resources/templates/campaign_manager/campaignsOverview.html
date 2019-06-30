@@ -12,7 +12,8 @@
 <div th:replace="fragments :: navbar">Navigation bar fragment</div>
 
 <div class="container-fluid body-content">
-    <form action="#" th:action="@{${T(com.greenapper.controllers.CampaignController).CAMPAIGN_CREATION_URI}}"
+    <form action="#"
+          th:action="@{${T(com.greenapper.controllers.campaign.OfferCampaignController).CAMPAIGN_CREATION_URI}}"
           method="get" style="margin:auto;">
         <input class="btn btn-default" th:value="#{campaign.overview.create.button}" type="submit"/>
     </form>

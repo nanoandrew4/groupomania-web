@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
  * Generic campaign form to be sent from the frontend to the backend. Numeric and date fields are stored as strings,
  * so that validations can be performed in the backend.
  */
-public abstract class CampaignForm {
+public class CampaignForm {
 	private Long id;
 
 	private String title;
@@ -38,7 +38,7 @@ public abstract class CampaignForm {
 
 	private String discountedPrice;
 
-	public CampaignForm() {
+	protected CampaignForm() {
 	}
 
 	public CampaignForm(final Campaign campaign) {

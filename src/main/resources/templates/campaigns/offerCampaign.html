@@ -14,9 +14,11 @@
         <div class="text-center">
             <h1 th:text="#{campaign.generic.subtitle}">Campaign settings</h1>
         </div>
-        <form th:replace="campaigns/campaignFragments :: campaignTypeChange">Generic campaign fragment</form>
 
-        <form action="#" th:action="@{${T(com.greenapper.controllers.CampaignController).CAMPAIGN_CREATION_URI}}"
+        <div th:replace="campaigns/campaignFragments :: campaignTypeDropdown"></div>
+
+        <form action="#"
+              th:action="@{${T(com.greenapper.controllers.campaign.OfferCampaignController).CAMPAIGN_CREATION_URI}}"
               th:method="post" th:object="${campaignForm}" enctype="multipart/form-data">
 
             <form th:replace="fragments :: validationErrors">Generic campaign fragment</form>

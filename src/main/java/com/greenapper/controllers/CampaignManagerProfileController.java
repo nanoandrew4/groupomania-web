@@ -27,7 +27,7 @@ public class CampaignManagerProfileController {
 
 	public final static String PROFILE_UPDATE_FORM = "campaign_manager/profileSetup";
 
-	public final static String PROFILE_UPDATE_SUCCESS = "redirect:" + CampaignController.CAMPAIGNS_OVERVIEW_URI;
+	public final static String PROFILE_UPDATE_SUCCESS = "redirect:" + CampaignManagerController.CAMPAIGNS_OVERVIEW_URI;
 
 	/**
 	 * Retrieves the {@link CampaignManagerProfile} associated to the {@link CampaignManager} that is in session,
