@@ -20,7 +20,7 @@ public class OfferCampaignFormValidator implements Validator {
 
 	@Override
 	public boolean supports(Class<?> clazz) {
-		return OfferCampaign.class.equals(clazz);
+		return OfferCampaignForm.class.equals(clazz);
 	}
 
 	@Override

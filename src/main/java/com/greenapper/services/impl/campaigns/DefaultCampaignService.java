@@ -51,17 +51,19 @@ public abstract class DefaultCampaignService implements CampaignService {
 				campaign.setState(CampaignState.INACTIVE);
 				setDefaultsForCampaignSubtype(campaign);
 				saveCampaign(campaign, campaignForm);
+				LOG.info("Created campaign with ID: " + campaign.getId() + " of type: " + campaign.getType() + " for user: " + campaign.getOwner().getId());
 			});
 		}
 	}
 
 	@Override
-	public void editCampaign(final CampaignForm campaignForm, final Errors errors) {
+	public void updateCampaign(final CampaignForm campaignForm, final Errors errors) {
 		validateCampaign(campaignForm, errors);
 		if (!errors.hasErrors()) {
 			campaignFactory.createCampaignModel(campaignForm).ifPresent(campaign -> {
 				campaign.setOwner(getSessionCampaignManager());
 				saveCampaign(campaign, campaignForm);
+				LOG.info("Updated campaign with ID: " + campaign.getId() + " of type: " + campaign.getType() + " for user: " + campaign.getOwner().getId());
 			});
 		}
 	}
@@ -75,21 +77,23 @@ public abstract class DefaultCampaignService implements CampaignService {
 					campaign.setStartDate(LocalDate.now());
 				campaign.setEndDate(LocalDate.now());
 			}
-			campaignManagerService.addCampaignToCurrentUser(campaign);
+			campaignManagerService.addCampaignToCampaignManager(campaign);
+			LOG.info("Created campaign state for campaign with ID: " + campaign.getId() + " of type: " + campaign.getType()
+					 + " for user: " + campaign.getOwner().getId() + " and with new state: " + campaign.getState());
 		});
 	}
 
 	@Override
-	public Campaign getCampaignById(final Long id) {
-		return campaignRepository.findById(id).orElse(null);
+	public Optional<Campaign> getCampaignById(final Long id) {
+		return campaignRepository.findById(id);
 	}
 
 	@Override
-	public Campaign getCampaignByIdAndSessionUser(final Long id) {
+	public Optional<Campaign> getCampaignByIdAndSessionUser(final Long id) {
 		final Optional<Campaign> campaign = campaignRepository.findById(id);
 		if (campaign.isPresent() && campaign.get().getOwner().getId().equals(sessionService.getSessionUser().getId()))
-			return campaign.get();
-		return null;
+			return campaign;
+		return Optional.empty();
 	}
 
 	@Override
@@ -98,7 +102,7 @@ public abstract class DefaultCampaignService implements CampaignService {
 	}
 
 	@Override
-	public List<Campaign> getAllCampaignsForCurrentUser() {
+	public List<Campaign> getAllCampaignsForSessionUser() {
 		return getSessionCampaignManager().getCampaigns();
 	}
 
@@ -116,7 +120,7 @@ public abstract class DefaultCampaignService implements CampaignService {
 		Optional.ofNullable(imagePath).ifPresent(campaign::setCampaignImageFilePath);
 
 		campaignRepository.save(campaign);
-		campaignManagerService.addCampaignToCurrentUser(campaign);
+		campaignManagerService.addCampaignToCampaignManager(campaign);
 	}
 
 	private CampaignManager getSessionCampaignManager() {

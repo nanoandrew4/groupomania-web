@@ -18,12 +18,12 @@ import javax.servlet.http.HttpServletResponse;
 @Order(0)
 public class GlobalExceptionHandler extends AbstractHandlerExceptionResolver {
 
-	private Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+	private Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
 	@Override
 	protected ModelAndView doResolveException
 			(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-		logger.error("An uncaught exception was intercepted: ", ex);
+		LOG.error("An uncaught exception was intercepted: ", ex);
 		return null;
 	}
 }

@@ -12,7 +12,7 @@ import java.util.Set;
 		strategy = InheritanceType.JOINED
 )
 @Table(name = "Users")
-public abstract class User {
+public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -30,6 +30,8 @@ public abstract class User {
 	private Set<Authority> authorities;
 
 	private boolean passwordChangeRequired;
+
+	protected User() {}
 
 	public Long getId() {
 		return id;

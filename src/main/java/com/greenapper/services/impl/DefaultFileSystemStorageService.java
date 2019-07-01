@@ -83,7 +83,7 @@ public class DefaultFileSystemStorageService implements FileSystemStorageService
 	}
 
 	@Override
-	public Optional<byte[]> readImage(String name) {
+	public Optional<byte[]> readImage(final String name) {
 		try {
 			return Optional.of(Files.readAllBytes(Paths.get(rootStorageDir + name)));
 		} catch (IOException e) {

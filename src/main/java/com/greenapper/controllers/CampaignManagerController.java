@@ -2,6 +2,7 @@ package com.greenapper.controllers;
 
 import com.greenapper.controllers.campaign.BaseCampaignController;
 import com.greenapper.controllers.campaign.OfferCampaignController;
+import com.greenapper.enums.CampaignState;
 import com.greenapper.factories.CampaignFormFactory;
 import com.greenapper.forms.PasswordUpdateForm;
 import com.greenapper.forms.campaigns.CampaignForm;
@@ -18,8 +19,6 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
-import java.util.function.Predicate;
 
 /**
  * Controller that handles all operations related to the {@link CampaignManager} type. Also handles methods relating
@@ -108,10 +107,9 @@ public class CampaignManagerController {
 	 */
 	@GetMapping(CAMPAIGN_UPDATE_URI)
 	public String getCampaignForEditById(final Model model, @PathVariable final Long id) {
-		final Predicate<Campaign> findById = campaign -> campaign.getId().equals(id);
-		final Campaign campaign = campaignManagerService.getCampaigns().stream().filter(findById).findFirst().orElse(null);
+		final Campaign campaign = campaignService.getCampaignByIdAndSessionUser(id).orElse(null);
 
-		if (campaign != null) {
+		if (campaign != null && campaign.getState() != CampaignState.ARCHIVED) {
 			model.addAttribute("campaignForm", campaignFormFactory.createCampaignForm(campaign));
 			return BaseCampaignController.getPageForCampaignType(campaign.getType().displayName);
 		}

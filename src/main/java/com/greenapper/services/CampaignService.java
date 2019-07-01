@@ -7,6 +7,7 @@ import com.greenapper.models.campaigns.Campaign;
 import org.springframework.validation.Errors;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service that contains all business logic pertaining to {@link Campaign} and its subclasses.
@@ -29,7 +30,7 @@ public interface CampaignService {
 	 * @param campaignForm Form with which to update the existing campaign entity
 	 * @param errors       Errors instance into which to write any validation errors that arise
 	 */
-	void editCampaign(final CampaignForm campaignForm, final Errors errors);
+	void updateCampaign(final CampaignForm campaignForm, final Errors errors);
 
 	/**
 	 * Updates the state of the campaign matching the supplied ID with the supplied state. Must be a case insensitive
@@ -61,24 +62,24 @@ public interface CampaignService {
 	 * Retrieves a {@link Campaign} given its ID, or null if it does not exist.
 	 *
 	 * @param id ID of the campaign to retrieve
-	 * @return The retrieved campaign, or null if it was not found
+	 * @return The retrieved campaign wrapped in an optional
 	 */
-	Campaign getCampaignById(final Long id);
+	Optional<Campaign> getCampaignById(final Long id);
 
 	/**
 	 * Retrieves a {@link Campaign} by ID, if it is associated to the {@link CampaignManager} currently in session.
 	 *
 	 * @param id ID of the campaign to retrieve
-	 * @return The retrieved campaign, or null if it was not found
+	 * @return The retrieved campaign wrapped in an optional
 	 */
-	Campaign getCampaignByIdAndSessionUser(final Long id);
+	Optional<Campaign> getCampaignByIdAndSessionUser(final Long id);
 
 	/**
 	 * Retrieves all the {@link Campaign}s for the {@link CampaignManager} in session.
 	 *
 	 * @return A list of the campaigns associated to the manager in session
 	 */
-	List<Campaign> getAllCampaignsForCurrentUser();
+	List<Campaign> getAllCampaignsForSessionUser();
 
 	/**
 	 * Retrieves all stored campaigns.

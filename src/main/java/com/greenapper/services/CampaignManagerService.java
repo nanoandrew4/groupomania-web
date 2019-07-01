@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface CampaignManagerService {
 	Optional<CampaignManager> getByUsername(final String username);
 
-	void addCampaignToCurrentUser(final Campaign campaign);
+	void addCampaignToCampaignManager(final Campaign campaign);
 
 	void updatePassword(final PasswordUpdateForm passwordUpdateForm, final Errors errors);
 

@@ -3,7 +3,7 @@ package com.greenapper.controllers.campaign;
 import com.greenapper.controllers.CampaignManagerController;
 import com.greenapper.enums.CampaignState;
 import com.greenapper.exceptions.InvalidCampaignTypeException;
-import com.greenapper.exceptions.NoSuchCampaignException;
+import com.greenapper.exceptions.UnknownIdentifierException;
 import com.greenapper.factories.CampaignFormFactory;
 import com.greenapper.forms.campaigns.CampaignForm;
 import com.greenapper.models.campaigns.Campaign;
@@ -45,17 +45,21 @@ public abstract class BaseCampaignController {
 	 * @return Thymeleaf page to load with the returned data
 	 */
 	public String getCampaignById(final Model model, @PathVariable final Long id) {
-		final Optional<CampaignForm> campaignForm = campaignFormFactory.createCampaignForm(getCampaignService().getCampaignById(id));
-		model.addAttribute("campaignForm", campaignForm.orElse(null));
+		final Optional<Campaign> campaign = getCampaignService().getCampaignById(id);
+		final Optional<CampaignForm> campaignForm = campaign.flatMap(campaignFormFactory::createCampaignForm);
+
+		if (campaign.isPresent() && !isCampaignUnlisted(campaign.get()))
+			model.addAttribute("campaignForm", campaignForm.orElse(null));
 		model.addAttribute("readonly", true);
 
-		return getPageForCampaignType(campaignForm.orElseThrow(() -> new NoSuchCampaignException(id)).getType().displayName.toLowerCase());
+		final CampaignForm unboxedCampaignForm = campaignForm.orElseThrow(() -> new UnknownIdentifierException("No campaign found with id: " + id));
+		return getPageForCampaignType(unboxedCampaignForm.getType().displayName.toLowerCase());
 	}
 
 	/**
 	 * Begins the campaign creation/update process. First the appropriate service is fetched, based on the campaign type,
 	 * and then it is passed down to it, either through {@link CampaignService#createCampaign(CampaignForm, Errors)} if
-	 * the form has no ID attached, or through {@link CampaignService#editCampaign(CampaignForm, Errors)} if there is an
+	 * the form has no ID attached, or through {@link CampaignService#updateCampaign(CampaignForm, Errors)} if there is an
 	 * ID associated with the sent form (which should only happen when the campaign is edited, since otherwise the ID
 	 * in the form will be null.)
 	 *
@@ -67,12 +71,12 @@ public abstract class BaseCampaignController {
 	 */
 	public String updateCampaign(final CampaignForm campaignForm, final Errors errors) {
 		if (campaignForm == null)
-			throw new NoSuchCampaignException();
+			throw new UnknownIdentifierException("Campaign form was null, cannot initiate update operation");
 
 		if (campaignForm.getId() == null)
 			getCampaignService().createCampaign(campaignForm, errors);
 		else
-			getCampaignService().editCampaign(campaignForm, errors);
+			getCampaignService().updateCampaign(campaignForm, errors);
 
 		if (!errors.hasErrors())
 			return CAMPAIGN_CREATION_SUCCESS_REDIRECT;
@@ -92,12 +96,21 @@ public abstract class BaseCampaignController {
 	public String getAllVisibleCampaigns(final Model model) {
 		final List<Campaign> campaigns = getCampaignService().getAllCampaigns();
 
-		campaigns.removeIf(campaign -> campaign.getState() == CampaignState.INACTIVE);
-		campaigns.removeIf(campaign -> campaign.isShowAfterExpiration() && LocalDate.now().isAfter(campaign.getEndDate().plus(4, ChronoUnit.DAYS)));
-		campaigns.removeIf(campaign -> !campaign.isShowAfterExpiration() && LocalDate.now().isAfter(campaign.getEndDate()));
+		campaigns.removeIf(this::isCampaignUnlisted);
 
 		model.addAttribute("campaigns", campaigns);
 		return "home";
+	}
+
+	/**
+	 * Determines if a campaign should be publicly visible.
+	 *
+	 * @param campaign Campaign for which to determine if it should be publicly visible or not
+	 * @return True if the the campaign should be unlisted, false if the campaign should be publicly visible
+	 */
+	private boolean isCampaignUnlisted(final Campaign campaign) {
+		return campaign.getState() == CampaignState.INACTIVE || (campaign.isShowAfterExpiration() && LocalDate.now().isAfter(campaign.getEndDate().plus(4, ChronoUnit.DAYS)))
+			   || (!campaign.isShowAfterExpiration() && LocalDate.now().isAfter(campaign.getEndDate()));
 	}
 
 	/**

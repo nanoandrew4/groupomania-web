@@ -2,7 +2,6 @@ package com.greenapper.validators;
 
 import com.greenapper.config.SecurityConfig;
 import com.greenapper.forms.PasswordUpdateForm;
-import com.greenapper.models.CampaignManager;
 import com.greenapper.models.User;
 import com.greenapper.services.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +25,7 @@ public class PasswordUpdateValidator implements Validator {
 
 	@Override
 	public boolean supports(Class<?> clazz) {
-		return clazz.equals(CampaignManager.class);
+		return clazz.equals(PasswordUpdateForm.class);
 	}
 
 	@Override

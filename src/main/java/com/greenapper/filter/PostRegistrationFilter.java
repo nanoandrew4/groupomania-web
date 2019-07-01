@@ -37,7 +37,7 @@ public class PostRegistrationFilter implements Filter {
 
 		String redirectUri = null;
 		if (sessionUser instanceof CampaignManager)
-			redirectUri = checkCampaignManagerData((CampaignManager) sessionUser);
+			redirectUri = determineRedirectUri((CampaignManager) sessionUser);
 
 		if (redirectUri != null && allowRedirect(((HttpServletRequest) request), redirectUri))
 			redirectStrategy.sendRedirect((HttpServletRequest) request, (HttpServletResponse) response, redirectUri);
@@ -68,7 +68,7 @@ public class PostRegistrationFilter implements Filter {
 	 * @param sessionCampaignManager The {@link CampaignManager} currently in session
 	 * @return Redirect URI to complete missing information, or null if all necessary information is present
 	 */
-	private String checkCampaignManagerData(final CampaignManager sessionCampaignManager) {
+	private String determineRedirectUri(final CampaignManager sessionCampaignManager) {
 		if (sessionCampaignManager.isPasswordChangeRequired())
 			return CampaignManagerController.PASSWORD_UPDATE_URI;
 

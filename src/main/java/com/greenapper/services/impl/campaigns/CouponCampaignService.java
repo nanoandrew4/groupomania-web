@@ -21,8 +21,7 @@ public class CouponCampaignService extends DefaultCampaignService {
 	private CampaignManagerProfileService campaignManagerProfileService;
 
 	@Override
-	public void validateCampaign(final
-								 CampaignForm campaignForm, final Errors errors) {
+	public void validateCampaign(final CampaignForm campaignForm, final Errors errors) {
 		couponCampaignFormValidator.validate(campaignForm, errors);
 	}
 
