@@ -17,3 +17,24 @@ Optionally, to include some sample data, after the server has start up, run the 
 the 'scripts/' directory at the root of the project, which will load some sample data into the database, such as users and sample campaigns.
 This uses the psql client, which must be installed for the script to work. Otherwise, you can execute the script manually, it is located under
 src/main/resources/data-postgres.sql
+
+## Container security hardening
+
+On host system:
+
+sudo apt-get install auditd
+
+sudo nano /etc/audit/audit.rules
+
+-- Append the following:
+-w /usr/bin/docker -p wa
+-w /var/lib/docker -p wa
+-w /etc/docker -p wa
+-w /lib/systemd/system/docker.service -p wa
+-w /lib/systemd/system/docker.socket -p wa
+-w /etc/default/docker -p wa
+-w /etc/docker/daemon.json -p wa
+-w /usr/bin/docker-containerd -p wa
+-w /usr/bin/docker-runc -p wa
+
+sudo systemctl restart auditd

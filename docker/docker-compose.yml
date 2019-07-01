@@ -1,4 +1,4 @@
-version: "2"
+version: '2.2'
 
 services:
   postgres:
@@ -9,10 +9,33 @@ services:
       - POSTGRES_DB=groupomania
     ports:
       - "5432:5432"
+    restart: on-failure
+    mem_limit: 2G
+    cpu_shares: 500 # Default val is 1024, lower values increase CPU priority
+    pids_limit: 64 # Limits num of processes running in container, prevents fork bombs for example
+    read_only: true # Makes container read only
+    security_opt:
+      - no-new-privileges
+    tmpfs:
+      # For read-only filesystem, need to create a volume/tmpfs for PostgreSQL to run its much
+      # needed configuration. The read-only flag does not make volumes and tmpfs read-only.
+      - /tmp
+      - /run
+      - /run/postgresql
+
   groupomania:
     image: groupomania:latest
+    links:
+      - postgres
     ports:
       - "8443:8443"
     depends_on:
-      - "postgres"
-    command: ["./wait-for-it.sh", "postgres:5432"]
+      postgres:
+        condition: service_healthy
+    restart: always
+    mem_limit: 512M
+    cpu_shares: 500
+    pids_limit: 64
+    read_only: true
+    security_opt:
+      - no-new-privileges
