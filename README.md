@@ -32,14 +32,14 @@ First we make sure we have auditd installed, which is used to audit records to t
 
 Then we have to make sure that auditd is set up to audit docker containers:
 
-`echo $'-w /usr/bin/docker -p wa
--w /var/lib/docker -p wa
--w /etc/docker -p wa
--w /lib/systemd/system/docker.service -p wa
--w /lib/systemd/system/docker.socket -p wa
--w /etc/default/docker -p wa
--w /etc/docker/daemon.json -p wa
--w /usr/bin/docker-containerd -p wa
+`echo $'-w /usr/bin/docker -p wa\n
+-w /var/lib/docker -p wa\n
+-w /etc/docker -p wa\n
+-w /lib/systemd/system/docker.service -p wa\n
+-w /lib/systemd/system/docker.socket -p wa\n
+-w /etc/default/docker -p wa\n
+-w /etc/docker/daemon.json -p wa\n
+-w /usr/bin/docker-containerd -p wa\n
 -w /usr/bin/docker-runc -p wa' | sudo tee /etc/audit/audit.rules`
 
 Then we restart the service, so that the changes take effect:
@@ -50,14 +50,14 @@ Then we restart the service, so that the changes take effect:
 Next, we are going to set up some restrictions on our docker daemon. Run the following command
 to generate the daemon.json file that we will be using:
 
-`echo $'{
-    "icc": false,
-    "userns-remap": "default",
-    "disable-legacy-registry": true,
-    "live-restore": true,
-    "userland-proxy": false,
-    "no-new-privileges": true,
-    "storage-driver": "overlay2"
+`echo $'{\n
+    "icc": false,\n
+    "userns-remap": "default",\n
+    "disable-legacy-registry": true,\n
+    "live-restore": true,\n
+    "userland-proxy": false,\n
+    "no-new-privileges": true,\n
+    "storage-driver": "overlay2"\n
 }' | sudo tee /etc/docker/daemon.json`
 
 A short explanation of each of the flags we are setting:
