@@ -36,7 +36,6 @@ public class CampaignManagerIntegrationTest {
 	private SessionService sessionService;
 
 	@Before
-//	@Sql("../data-h2.sql")
 	public void setup() {
 		final CampaignManager campaignManager = campaignManagerService.getByUsername("admin").orElse(null);
 

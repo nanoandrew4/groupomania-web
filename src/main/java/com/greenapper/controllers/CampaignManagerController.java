@@ -20,6 +20,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.Comparator;
+import java.util.List;
+
 /**
  * Controller that handles all operations related to the {@link CampaignManager} type. Also handles methods relating
  * to a specified managers campaigns.
@@ -94,7 +97,10 @@ public class CampaignManagerController {
 	 */
 	@GetMapping(CAMPAIGNS_OVERVIEW_URI)
 	public String getCampaignOverview(final Model model) {
-		model.addAttribute("campaigns", campaignManagerService.getCampaigns());
+		final List<Campaign> campaigns = campaignManagerService.getCampaigns();
+		campaigns.sort(Comparator.comparing(Campaign::getStartDate));
+
+		model.addAttribute("campaigns", campaigns);
 		return CAMPAIGNS_OVERVIEW_FORM;
 	}
 
@@ -110,7 +116,7 @@ public class CampaignManagerController {
 		final Campaign campaign = campaignService.getCampaignByIdAndSessionUser(id).orElse(null);
 
 		if (campaign != null && campaign.getState() != CampaignState.ARCHIVED) {
-			model.addAttribute("campaignForm", campaignFormFactory.createCampaignForm(campaign));
+			model.addAttribute("campaignForm", campaignFormFactory.createCampaignForm(campaign).orElse(null));
 			return BaseCampaignController.getPageForCampaignType(campaign.getType().displayName);
 		}
 

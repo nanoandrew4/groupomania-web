@@ -8,6 +8,7 @@ import com.greenapper.factories.CampaignFormFactory;
 import com.greenapper.forms.campaigns.CampaignForm;
 import com.greenapper.models.campaigns.Campaign;
 import com.greenapper.services.CampaignService;
+import com.greenapper.services.SessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +31,9 @@ public abstract class BaseCampaignController {
 
 	@Autowired
 	private CampaignFormFactory campaignFormFactory;
+
+	@Autowired
+	private SessionService sessionService;
 
 	private Logger LOG = LoggerFactory.getLogger(BaseCampaignController.class);
 
@@ -48,8 +53,13 @@ public abstract class BaseCampaignController {
 		final Optional<Campaign> campaign = getCampaignService().getCampaignById(id);
 		final Optional<CampaignForm> campaignForm = campaign.flatMap(campaignFormFactory::createCampaignForm);
 
-		if (campaign.isPresent() && !isCampaignUnlisted(campaign.get()))
-			model.addAttribute("campaignForm", campaignForm.orElse(null));
+		if (campaign.isPresent()) {
+			final boolean doesCampaignBelongToSessionUser = sessionService.getSessionUser() != null
+															&& campaign.get().getOwner().getId().equals(sessionService.getSessionUser().getId());
+
+			if (doesCampaignBelongToSessionUser || !isCampaignUnlisted(campaign.get()))
+				model.addAttribute("campaignForm", campaignForm.orElse(null));
+		}
 		model.addAttribute("readonly", true);
 
 		final CampaignForm unboxedCampaignForm = campaignForm.orElseThrow(() -> new UnknownIdentifierException("No campaign found with id: " + id));
@@ -97,6 +107,7 @@ public abstract class BaseCampaignController {
 		final List<Campaign> campaigns = getCampaignService().getAllCampaigns();
 
 		campaigns.removeIf(this::isCampaignUnlisted);
+		campaigns.sort(Comparator.comparing(Campaign::getStartDate));
 
 		model.addAttribute("campaigns", campaigns);
 		return "home";
@@ -109,8 +120,10 @@ public abstract class BaseCampaignController {
 	 * @return True if the the campaign should be unlisted, false if the campaign should be publicly visible
 	 */
 	private boolean isCampaignUnlisted(final Campaign campaign) {
-		return campaign.getState() == CampaignState.INACTIVE || (campaign.isShowAfterExpiration() && LocalDate.now().isAfter(campaign.getEndDate().plus(4, ChronoUnit.DAYS)))
+		return campaign.getState() == CampaignState.INACTIVE
+			   || (campaign.isShowAfterExpiration() && LocalDate.now().isAfter(campaign.getEndDate().plus(4, ChronoUnit.DAYS)))
 			   || (!campaign.isShowAfterExpiration() && LocalDate.now().isAfter(campaign.getEndDate()));
+
 	}
 
 	/**

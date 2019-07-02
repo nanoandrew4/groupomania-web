@@ -22,7 +22,7 @@
             <label class="text-secondary" th:text="*{type.displayName}"></label>
             <span class="caret"></span>
         </button>
-        <ul class="dropdown-menu" aria-labelledby="languageMenu">
+        <ul class="dropdown-menu" aria-labelledby="languageMenu" th:if="${readonly == null && campaignForm.id == null}">
             <li th:each="campaignType : ${T(com.greenapper.enums.CampaignType).values()}">
                 <a th:href="@{'/campaigns/'+ ${#strings.toLowerCase(campaignType)} + '/create'}"
                    th:text="${campaignType.displayName}"></a>
