@@ -1,5 +1,6 @@
 package com.greenapper.services;
 
+import com.greenapper.dtos.campaign.CampaignDTO;
 import com.greenapper.forms.PasswordUpdateForm;
 import com.greenapper.models.CampaignManager;
 import com.greenapper.models.campaigns.Campaign;
@@ -15,7 +16,9 @@ public interface CampaignManagerService {
 
 	void updatePassword(final PasswordUpdateForm passwordUpdateForm, final Errors errors);
 
-	List<Campaign> getCampaigns();
+	List<CampaignDTO> getCampaigns();
+
+	void updateCampaignState(final Long id, final String newState);
 
 	boolean isCurrentUserPasswordChangeRequired();
 }

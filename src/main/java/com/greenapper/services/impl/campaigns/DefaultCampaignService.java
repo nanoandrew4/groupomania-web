@@ -1,6 +1,8 @@
 package com.greenapper.services.impl.campaigns;
 
+import com.greenapper.dtos.campaign.CampaignDTO;
 import com.greenapper.enums.CampaignState;
+import com.greenapper.factories.CampaignDTOFactory;
 import com.greenapper.factories.CampaignFactory;
 import com.greenapper.forms.campaigns.CampaignForm;
 import com.greenapper.models.CampaignManager;
@@ -18,6 +20,8 @@ import org.springframework.validation.Errors;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public abstract class DefaultCampaignService implements CampaignService {
 
@@ -35,6 +39,9 @@ public abstract class DefaultCampaignService implements CampaignService {
 
 	@Autowired
 	private CampaignFactory campaignFactory;
+
+	@Autowired
+	private CampaignDTOFactory campaignDTOFactory;
 
 	private Logger LOG = LoggerFactory.getLogger(this.getClass());
 
@@ -84,26 +91,19 @@ public abstract class DefaultCampaignService implements CampaignService {
 	}
 
 	@Override
-	public Optional<Campaign> getCampaignById(final Long id) {
-		return campaignRepository.findById(id);
+	public Optional<CampaignDTO> getCampaignById(final Long id) {
+		return campaignRepository.findById(id).map(campaignDTOFactory::createCampaignDTO);
 	}
 
 	@Override
-	public Optional<Campaign> getCampaignByIdAndSessionUser(final Long id) {
-		final Optional<Campaign> campaign = campaignRepository.findById(id);
-		if (campaign.isPresent() && campaign.get().getOwner().getId().equals(sessionService.getSessionUser().getId()))
-			return campaign;
-		return Optional.empty();
+	public Optional<CampaignDTO> getCampaignByIdForSessionUser(final Long id) {
+		final Predicate<Campaign> filterByOwner = campaign -> campaign.getOwner().getId().equals(sessionService.getSessionUser().getId());
+		return campaignRepository.findById(id).filter(filterByOwner).map(campaignDTOFactory::createCampaignDTO);
 	}
 
 	@Override
-	public List<Campaign> getAllCampaigns() {
-		return campaignRepository.findAll();
-	}
-
-	@Override
-	public List<Campaign> getAllCampaignsForSessionUser() {
-		return getSessionCampaignManager().getCampaigns();
+	public List<CampaignDTO> getAllCampaigns() {
+		return campaignRepository.findAll().stream().map(campaignDTOFactory::createCampaignDTO).collect(Collectors.toList());
 	}
 
 	/**

@@ -29,7 +29,7 @@ public class DefaultCampaignFactory implements CampaignFactory {
 			case COUPON:
 				return Optional.of(new CouponCampaign((CouponCampaignForm) campaignForm));
 			default:
-				LOG.warn("Cant create campaign for campaign form with id: " + campaignForm.getId() + " and type: " + campaignForm.getType());
+				LOG.error("Cant create campaign for campaign form with id: " + campaignForm.getId() + " and type: " + campaignForm.getType());
 				return Optional.empty();
 		}
 	}

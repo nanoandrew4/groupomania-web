@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
  * the default Spring error handlers.
  */
 @Component
-@Order(0)
+@Order(-10)
 public class GlobalExceptionHandler extends AbstractHandlerExceptionResolver {
 
 	private Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);

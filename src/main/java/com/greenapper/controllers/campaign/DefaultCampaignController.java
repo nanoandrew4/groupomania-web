@@ -1,5 +1,6 @@
 package com.greenapper.controllers.campaign;
 
+import com.greenapper.dtos.campaign.CampaignDTO;
 import com.greenapper.services.CampaignService;
 import com.greenapper.services.impl.campaigns.DefaultCampaignService;
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping("/campaigns")
@@ -21,8 +23,9 @@ public class DefaultCampaignController extends BaseCampaignController {
 	private Logger LOG = LoggerFactory.getLogger(DefaultCampaignService.class);
 
 	@GetMapping("/{id}")
-	public String getCampaignById(final Model model, @PathVariable final Long id) {
-		return super.getCampaignById(model, id);
+	public @ResponseBody
+	CampaignDTO getCampaignById(@PathVariable final Long id) {
+		return super.getCampaignById(id);
 	}
 
 	@GetMapping

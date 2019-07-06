@@ -1,24 +1,20 @@
 package com.greenapper.controllers.campaign;
 
 import com.greenapper.controllers.CampaignManagerController;
+import com.greenapper.dtos.campaign.CampaignDTO;
 import com.greenapper.enums.CampaignState;
 import com.greenapper.exceptions.InvalidCampaignTypeException;
 import com.greenapper.exceptions.UnknownIdentifierException;
-import com.greenapper.factories.CampaignFormFactory;
 import com.greenapper.forms.campaigns.CampaignForm;
-import com.greenapper.models.campaigns.Campaign;
 import com.greenapper.services.CampaignService;
-import com.greenapper.services.SessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,12 +24,6 @@ import java.util.Optional;
  * sense for anonymous users to request forms.
  */
 public abstract class BaseCampaignController {
-
-	@Autowired
-	private CampaignFormFactory campaignFormFactory;
-
-	@Autowired
-	private SessionService sessionService;
 
 	private Logger LOG = LoggerFactory.getLogger(BaseCampaignController.class);
 
@@ -45,25 +35,15 @@ public abstract class BaseCampaignController {
 	 * Retrieves a campaign by ID, and sets a flag to indicate to the frontend that the accompanying form should be
 	 * immutable.
 	 *
-	 * @param model Model into which the campaign form and immutability flag will be written to
 	 * @param id    Id of the campaign to retrieve
-	 * @return Thymeleaf page to load with the returned data
+	 * @return Requested campaign, if visible or owned by the current user in session
 	 */
-	public String getCampaignById(final Model model, @PathVariable final Long id) {
-		final Optional<Campaign> campaign = getCampaignService().getCampaignById(id);
-		final Optional<CampaignForm> campaignForm = campaign.flatMap(campaignFormFactory::createCampaignForm);
+	public CampaignDTO getCampaignById(@PathVariable final Long id) {
+		final Optional<CampaignDTO> campaignDTO = getCampaignService().getCampaignById(id);
 
-		if (campaign.isPresent()) {
-			final boolean doesCampaignBelongToSessionUser = sessionService.getSessionUser() != null
-															&& campaign.get().getOwner().getId().equals(sessionService.getSessionUser().getId());
-
-			if (doesCampaignBelongToSessionUser || !isCampaignUnlisted(campaign.get()))
-				model.addAttribute("campaignForm", campaignForm.orElse(null));
-		}
-		model.addAttribute("readonly", true);
-
-		final CampaignForm unboxedCampaignForm = campaignForm.orElseThrow(() -> new UnknownIdentifierException("No campaign found with id: " + id));
-		return getPageForCampaignType(unboxedCampaignForm.getType().displayName.toLowerCase());
+		if (campaignDTO.isPresent() && !isCampaignUnlisted(campaignDTO.get()))
+			return campaignDTO.orElse(null);
+		return getCampaignService().getCampaignByIdForSessionUser(id).orElse(null);
 	}
 
 	/**
@@ -104,10 +84,9 @@ public abstract class BaseCampaignController {
 	 * @return Home page
 	 */
 	public String getAllVisibleCampaigns(final Model model) {
-		final List<Campaign> campaigns = getCampaignService().getAllCampaigns();
+		final List<CampaignDTO> campaigns = getCampaignService().getAllCampaigns();
 
 		campaigns.removeIf(this::isCampaignUnlisted);
-		campaigns.sort(Comparator.comparing(Campaign::getStartDate));
 
 		model.addAttribute("campaigns", campaigns);
 		return "home";
@@ -119,10 +98,10 @@ public abstract class BaseCampaignController {
 	 * @param campaign Campaign for which to determine if it should be publicly visible or not
 	 * @return True if the the campaign should be unlisted, false if the campaign should be publicly visible
 	 */
-	private boolean isCampaignUnlisted(final Campaign campaign) {
+	private boolean isCampaignUnlisted(final CampaignDTO campaign) {
 		return campaign.getState() == CampaignState.INACTIVE
-			   || (campaign.isShowAfterExpiration() && LocalDate.now().isAfter(campaign.getEndDate().plus(4, ChronoUnit.DAYS)))
-			   || (!campaign.isShowAfterExpiration() && LocalDate.now().isAfter(campaign.getEndDate()));
+			   || (campaign.isShowAfterExpiration() && LocalDate.now().isAfter(LocalDate.parse(campaign.getEndDate()).plus(4, ChronoUnit.DAYS)))
+			   || (!campaign.isShowAfterExpiration() && LocalDate.now().isAfter(LocalDate.parse(campaign.getEndDate())));
 
 	}
 
