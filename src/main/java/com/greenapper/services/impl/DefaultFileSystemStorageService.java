@@ -1,5 +1,6 @@
 package com.greenapper.services.impl;
 
+import com.greenapper.exceptions.UnknownIdentifierException;
 import com.greenapper.services.FileSystemStorageService;
 import com.greenapper.services.SessionService;
 import org.slf4j.Logger;
@@ -21,7 +22,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 public class DefaultFileSystemStorageService implements FileSystemStorageService {
@@ -83,13 +83,13 @@ public class DefaultFileSystemStorageService implements FileSystemStorageService
 	}
 
 	@Override
-	public Optional<byte[]> readImage(final String name) {
+	public byte[] readImage(final String name) {
 		try {
-			return Optional.of(Files.readAllBytes(Paths.get(rootStorageDir + name)));
+			return Files.readAllBytes(Paths.get(rootStorageDir + name));
 		} catch (IOException e) {
 			LOG.error("Could not read image with name: \'" + name + "\'");
 		}
-		return Optional.empty();
+		throw new UnknownIdentifierException("No image with name: \'" + name + "\' found");
 	}
 
 	private String getSessionUsernameHash() {

@@ -1,10 +1,9 @@
 package com.greenapper.services;
 
+import com.greenapper.dtos.CampaignManagerProfileDTO;
 import com.greenapper.models.CampaignManager;
 import com.greenapper.models.CampaignManagerProfile;
 import org.springframework.validation.Errors;
-
-import java.util.Optional;
 
 /**
  * Service that contains all the business logic for {@link CampaignManagerProfile} entities.
@@ -25,5 +24,5 @@ public interface CampaignManagerProfileService {
 	 *
 	 * @return The profile for the manager in session, wrapped in an optional
 	 */
-	Optional<CampaignManagerProfile> getProfileForCurrentUser();
+	CampaignManagerProfileDTO getProfileForCurrentUser();
 }

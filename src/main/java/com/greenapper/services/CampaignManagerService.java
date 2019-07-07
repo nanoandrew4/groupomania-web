@@ -12,13 +12,11 @@ import java.util.Optional;
 public interface CampaignManagerService {
 	Optional<CampaignManager> getByUsername(final String username);
 
-	void addCampaignToCampaignManager(final Campaign campaign);
+	void addOrUpdateCampaignForCampaignManager(final Campaign campaign);
 
 	void updatePassword(final PasswordUpdateForm passwordUpdateForm, final Errors errors);
 
 	List<CampaignDTO> getCampaigns();
-
-	void updateCampaignState(final Long id, final String newState);
 
 	boolean isCurrentUserPasswordChangeRequired();
 }

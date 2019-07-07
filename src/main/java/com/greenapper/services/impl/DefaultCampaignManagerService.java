@@ -2,8 +2,6 @@ package com.greenapper.services.impl;
 
 import com.greenapper.config.SecurityConfig;
 import com.greenapper.dtos.campaign.CampaignDTO;
-import com.greenapper.enums.CampaignState;
-import com.greenapper.exceptions.UnknownIdentifierException;
 import com.greenapper.exceptions.ValidationException;
 import com.greenapper.factories.CampaignDTOFactory;
 import com.greenapper.forms.PasswordUpdateForm;
@@ -20,7 +18,6 @@ import org.springframework.validation.Validator;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
@@ -60,7 +57,7 @@ public class DefaultCampaignManagerService implements CampaignManagerService {
 	}
 
 	@Override
-	public void addCampaignToCampaignManager(final Campaign campaign) {
+	public void addOrUpdateCampaignForCampaignManager(final Campaign campaign) {
 		final CampaignManager campaignManager = getSessionCampaignManager();
 		campaignManager.getCampaigns().removeIf(campaign::equals);
 		campaignManager.getCampaigns().add(campaign);
@@ -70,18 +67,6 @@ public class DefaultCampaignManagerService implements CampaignManagerService {
 	@Override
 	public List<CampaignDTO> getCampaigns() {
 		return getSessionCampaignManager().getCampaigns().stream().map(campaignDTOFactory::createCampaignDTO).collect(Collectors.toList());
-	}
-
-	@Override
-	public void updateCampaignState(final Long id, final String newState) {
-		final Predicate<Campaign> filterById = campaign -> campaign.getId().equals(id);
-		final Campaign campaign = getSessionCampaignManager().getCampaigns().stream().filter(filterById).findFirst().orElse(null);
-
-		if (campaign == null)
-			throw new UnknownIdentifierException("The campaign with id: \'" + id + " \' could not be found");
-
-		campaign.setState(CampaignState.valueOf(newState));
-		campaignManagerRepository.save(getSessionCampaignManager());
 	}
 
 	@Override

@@ -1,5 +1,9 @@
 package com.greenapper.services.impl;
 
+import com.greenapper.dtos.CampaignManagerProfileDTO;
+import com.greenapper.exceptions.NotFoundException;
+import com.greenapper.exceptions.UnknownIdentifierException;
+import com.greenapper.exceptions.ValidationException;
 import com.greenapper.models.CampaignManager;
 import com.greenapper.models.CampaignManagerProfile;
 import com.greenapper.repositories.CampaignManagerProfileRepository;
@@ -34,26 +38,33 @@ public class DefaultCampaignManagerProfileService implements CampaignManagerProf
 	private Validator campaignManagerProfileValidator;
 
 	@Override
-	public Optional<CampaignManagerProfile> getProfileForCurrentUser() {
-		return campaignManagerProfileRepository.findById(sessionService.getSessionUser().getId());
+	public CampaignManagerProfileDTO getProfileForCurrentUser() {
+		final Long sessionUserId = sessionService.getSessionUser().getId();
+		final CampaignManagerProfile profile = campaignManagerProfileRepository.findById(sessionUserId).orElse(null);
+
+		if (profile == null)
+			throw new NotFoundException("Campaign manager profile was not found, for manager with id: \'" + sessionUserId + "\'");
+		return new CampaignManagerProfileDTO(profile);
 	}
 
 	@Override
 	public void updateProfile(final CampaignManagerProfile updatedProfile, final Errors errors) {
 		campaignManagerProfileValidator.validate(updatedProfile, errors);
-		if (!errors.hasErrors()) {
-			final Optional<CampaignManager> campaignManager = campaignManagerRepository.findById(sessionService.getSessionUser().getId());
-			if (campaignManager.isPresent()) {
-				updatedProfile.setId(campaignManager.get().getId());
 
-				final String profileImagePath = fileSystemStorageService.saveImage(updatedProfile.getProfileImage());
-				Optional.ofNullable(profileImagePath).ifPresent(updatedProfile::setProfileImageFilePath);
+		if (errors.hasErrors())
+			throw new ValidationException("Profile update for campaign manager with id: \'" + updatedProfile.getId() + "\' encountered validation errors", errors);
 
-				campaignManager.get().setCampaignManagerProfile(updatedProfile);
-				campaignManagerRepository.save(campaignManager.get());
-				campaignManagerProfileRepository.save(updatedProfile);
-				sessionService.setSessionUser(campaignManager.get());
-			}
-		}
+		final Long sessionUserId = sessionService.getSessionUser().getId();
+		final CampaignManager campaignManager = campaignManagerRepository.findById(sessionUserId)
+				.orElseThrow(() -> new UnknownIdentifierException("Could not find user with id: \'" + sessionUserId + "\'"));
+		updatedProfile.setId(sessionUserId);
+
+		final String profileImagePath = fileSystemStorageService.saveImage(updatedProfile.getProfileImage());
+		Optional.ofNullable(profileImagePath).ifPresent(updatedProfile::setProfileImageFilePath);
+
+		campaignManager.setCampaignManagerProfile(updatedProfile);
+		campaignManagerRepository.save(campaignManager);
+		campaignManagerProfileRepository.save(updatedProfile);
+		sessionService.setSessionUser(campaignManager);
 	}
 }

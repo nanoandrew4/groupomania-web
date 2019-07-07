@@ -2,8 +2,6 @@ package com.greenapper.services;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Optional;
-
 /**
  * Service that handles reading and writing files to the filesystem.
  */
@@ -22,5 +20,5 @@ public interface FileSystemStorageService {
 	 * @param path Path to the desired image
 	 * @return An array of bytes representing the image, wrapped in an optional
 	 */
-	Optional<byte[]> readImage(final String path);
+	byte[] readImage(final String path);
 }
