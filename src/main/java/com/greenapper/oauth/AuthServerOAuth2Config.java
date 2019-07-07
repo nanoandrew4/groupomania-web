@@ -27,8 +27,12 @@ public class AuthServerOAuth2Config extends AuthorizationServerConfigurerAdapter
 				.secret("publicCampaignManagerSecret")
 				.authorizedGrantTypes("password", "refresh_token")
 				.scopes("read", "write")
-				.autoApprove(true)
-				.redirectUris(CampaignManagerController.CAMPAIGNS_OVERVIEW_URI);
+				.redirectUris(CampaignManagerController.CAMPAIGNS_OVERVIEW_URI)
+				.and()
+				.withClient("swaggerClient")
+				.secret("swaggerDocs")
+				.authorizedGrantTypes("client_credentials")
+				.scopes("read");
 	}
 
 	@Override
