@@ -1,18 +1,18 @@
 package com.greenapper.controllers;
 
-import com.greenapper.dtos.ValidationErrorDTO;
 import com.greenapper.dtos.campaign.CampaignDTO;
-import com.greenapper.exceptions.ValidationException;
 import com.greenapper.forms.PasswordUpdateForm;
 import com.greenapper.models.CampaignManager;
 import com.greenapper.services.CampaignManagerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -57,11 +57,5 @@ public class CampaignManagerController {
 	public List<CampaignDTO> getCampaignManagerCampaigns() {
 		LOG.info("Retrieving all campaigns for the session campaign manager");
 		return campaignManagerService.getCampaigns();
-	}
-
-	@ExceptionHandler(ValidationException.class)
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public ValidationErrorDTO handleValidationError(final Exception e) {
-		return new ValidationErrorDTO((ValidationException) e);
 	}
 }

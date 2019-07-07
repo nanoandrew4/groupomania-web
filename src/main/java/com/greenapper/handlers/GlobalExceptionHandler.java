@@ -1,29 +1,32 @@
 package com.greenapper.handlers;
 
+import com.greenapper.dtos.ErrorDTO;
+import com.greenapper.dtos.ValidationErrorDTO;
+import com.greenapper.exceptions.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.handler.AbstractHandlerExceptionResolver;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-/**
- * Serves as a logger for all exceptions thrown inside the application, but delegates exception resolution to
- * the default Spring error handlers.
- */
-@Component
-@Order(-10)
-public class GlobalExceptionHandler extends AbstractHandlerExceptionResolver {
+@ControllerAdvice
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 	private Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-	@Override
-	protected ModelAndView doResolveException
-			(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-		LOG.error("An uncaught exception was intercepted: ", ex);
-		return null;
+	@ExceptionHandler(RuntimeException.class)
+	public ResponseEntity handle(RuntimeException ex) {
+		try {
+			final HttpStatus responseStatus = ex.getClass().getAnnotation(ResponseStatus.class).code();
+			if (ex instanceof ValidationException)
+				return new ResponseEntity<>(new ValidationErrorDTO((ValidationException) ex), responseStatus);
+			return new ResponseEntity<>(new ErrorDTO(ex), responseStatus);
+		} catch (NullPointerException e) {
+			LOG.error("Unhandled exception", ex);
+			return new ResponseEntity<>(new ErrorDTO(ex), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }
