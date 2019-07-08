@@ -7,6 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.time.LocalDate;
+import java.util.Optional;
 
 /**
  * Model for coupon type campaigns, which extends from the generic {@link Campaign} model.
@@ -34,13 +35,17 @@ public class CouponCampaign extends Campaign {
 	}
 
 	public CouponCampaign(final CouponCampaignForm couponCampaignForm) {
-		super(couponCampaignForm);
-		this.couponDescription = couponCampaignForm.getCouponDescription();
-		this.campaignManagerName = couponCampaignForm.getCampaignManagerName();
-		this.campaignManagerEmail = couponCampaignForm.getCampaignManagerEmail();
-		this.campaignManagerAddress = couponCampaignForm.getCampaignManagerAddress();
-		this.couponStartDate = LocalDate.parse(couponCampaignForm.getCouponStartDate());
-		this.couponEndDate = LocalDate.parse(couponCampaignForm.getCouponEndDate());
+		populate(couponCampaignForm);
+	}
+
+	public void populate(final CouponCampaignForm couponCampaignForm) {
+		super.populate(couponCampaignForm);
+		Optional.ofNullable(couponCampaignForm.getCouponDescription()).ifPresent(this::setCouponDescription);
+		Optional.ofNullable(couponCampaignForm.getCampaignManagerName()).ifPresent(this::setCampaignManagerName);
+		Optional.ofNullable(couponCampaignForm.getCampaignManagerEmail()).ifPresent(this::setCampaignManagerEmail);
+		Optional.ofNullable(couponCampaignForm.getCampaignManagerAddress()).ifPresent(this::setCampaignManagerAddress);
+		Optional.ofNullable(couponCampaignForm.getCouponStartDate()).ifPresent(s -> this.setCouponStartDate(LocalDate.parse(s)));
+		Optional.ofNullable(couponCampaignForm.getCouponEndDate()).ifPresent(s -> this.setCouponEndDate(LocalDate.parse(s)));
 	}
 
 	public String getCouponDescription() {

@@ -1,8 +1,9 @@
 package com.greenapper.models;
 
-import org.springframework.web.multipart.MultipartFile;
+import com.greenapper.forms.CampaignManagerProfileForm;
 
 import javax.persistence.*;
+import java.util.Optional;
 
 /**
  * Model for campaign manager profiles, which are associated to a {@link CampaignManager}.
@@ -23,10 +24,14 @@ public class CampaignManagerProfile {
 
 	private String address;
 
-	@Transient
-	private MultipartFile profileImage;
-
 	private String profileImageFilePath;
+
+	public void populate(final CampaignManagerProfileForm profileForm) {
+		Optional.ofNullable(profileForm.getCampaignManager()).ifPresent(this::setCampaignManager);
+		Optional.ofNullable(profileForm.getName()).ifPresent(this::setName);
+		Optional.ofNullable(profileForm.getEmail()).ifPresent(this::setEmail);
+		Optional.ofNullable(profileForm.getEmail()).ifPresent(this::setAddress);
+	}
 
 	public Long getId() {
 		return id;
@@ -66,14 +71,6 @@ public class CampaignManagerProfile {
 
 	public void setAddress(String address) {
 		this.address = address;
-	}
-
-	public MultipartFile getProfileImage() {
-		return profileImage;
-	}
-
-	public void setProfileImage(MultipartFile profileImage) {
-		this.profileImage = profileImage;
 	}
 
 	public String getProfileImageFilePath() {

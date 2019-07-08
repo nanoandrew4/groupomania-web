@@ -1,6 +1,7 @@
 package com.greenapper.services;
 
 import com.greenapper.dtos.CampaignManagerProfileDTO;
+import com.greenapper.forms.CampaignManagerProfileForm;
 import com.greenapper.models.CampaignManager;
 import com.greenapper.models.CampaignManagerProfile;
 import org.springframework.validation.Errors;
@@ -10,13 +11,13 @@ import org.springframework.validation.Errors;
  */
 public interface CampaignManagerProfileService {
 	/**
-	 * Updates the profile for the {@link CampaignManager} in session with the supplied {@link CampaignManagerProfile},
+	 * Updates the profile for the {@link CampaignManager} in session with the supplied {@link CampaignManagerProfileForm},
 	 * after validating that the fields contain valid data.
 	 *
-	 * @param updatedProfile Profile containing the desired data
+	 * @param updatedProfile Profile form containing the desired data
 	 * @param errors         Errors instance into which to write any validations errors that appear during validation
 	 */
-	void updateProfile(final CampaignManagerProfile updatedProfile, final Errors errors);
+	void updateProfile(final CampaignManagerProfileForm updatedProfile, final Errors errors);
 
 	/**
 	 * Retrieves the {@link CampaignManagerProfile} for the {@link CampaignManager} currently in session, wrapped in an

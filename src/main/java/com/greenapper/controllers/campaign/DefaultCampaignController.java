@@ -1,9 +1,11 @@
 package com.greenapper.controllers.campaign;
 
+import com.greenapper.dtos.ErrorDTO;
 import com.greenapper.dtos.campaign.CampaignDTO;
 import com.greenapper.enums.CampaignState;
 import com.greenapper.services.CampaignService;
 import com.greenapper.services.impl.campaigns.DefaultCampaignService;
+import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/campaigns")
+@Api(value = "/campaigns", description = "Generic campaign endpoints, applicable to all campaign types")
 public class DefaultCampaignController {
 
 	@Autowired
@@ -32,7 +35,16 @@ public class DefaultCampaignController {
 	 * @return Requested campaign, if visible or owned by the current user in session
 	 */
 	@GetMapping("/{id}")
-	public CampaignDTO getCampaignById(@PathVariable final Long id) {
+	@ApiOperation(
+			value = "Retrieves a campaign given its ID",
+			notes = "The campaign is only returned if it is publicly visible, or if it belongs to the campaign manager currently in session"
+	)
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Campaign retrieved successfully"),
+			@ApiResponse(code = 404, message = "Campaign not found, or not publicly visible", response = ErrorDTO.class)
+	})
+	public CampaignDTO getCampaignById(
+			@PathVariable @ApiParam(value = "ID of the campaign to retrieve", required = true) final Long id) {
 		final Optional<CampaignDTO> campaignDTO = campaignService.getCampaignById(id);
 
 		if (campaignDTO.isPresent() && !isCampaignUnlisted(campaignDTO.get()))
@@ -47,6 +59,10 @@ public class DefaultCampaignController {
 	 * @return Home page
 	 */
 	@GetMapping
+	@ApiOperation(value = "Retrieves all visible campaigns", notes = "The returned list will be empty if no campaigns are currently visible")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Campaigns retrieved successfully")
+	})
 	public List<CampaignDTO> getAllVisibleCampaigns() {
 		final List<CampaignDTO> campaigns = campaignService.getAllCampaigns();
 		campaigns.removeIf(this::isCampaignUnlisted);
@@ -54,9 +70,16 @@ public class DefaultCampaignController {
 		return campaigns;
 	}
 
-	@PatchMapping("/state/{id}/{state}")
 	@Secured("ROLE_CAMPAIGN_MANAGER")
-	public void updateCampaignState(@PathVariable final Long id, @PathVariable final String state) {
+	@PatchMapping("/state/{id}/{state}")
+	@ApiOperation(value = "Updates the state of an existing campaign to the newly supplied value")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Campaign state updated successfully"),
+			@ApiResponse(code = 404, message = "Specified campaign not found", response = ErrorDTO.class)
+	})
+	public void updateCampaignState(
+			@PathVariable @ApiParam(value = "ID of the campaign whose state to modify", required = true) final Long id,
+			@PathVariable @ApiParam(value = "New state to associate with the specified campaign", required = true, allowableValues = "active,inactive,archive") final String state) {
 		LOG.info("Updating campaign state for campaign with id: \'" + id + "\'. New state is: \'" + state + "\'");
 		campaignService.updateCampaignState(id, state);
 	}

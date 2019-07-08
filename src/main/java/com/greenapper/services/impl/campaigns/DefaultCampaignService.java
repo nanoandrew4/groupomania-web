@@ -68,11 +68,11 @@ public abstract class DefaultCampaignService implements CampaignService {
 	public void updateCampaign(final CampaignForm campaignForm, final Errors errors) {
 		validateCampaign(campaignForm, errors);
 
-		if (errors.hasErrors())
-			throw new ValidationException("Validation errors where encountered when updating a campaign", errors);
-
 		if (campaignForm.getId() == null)
 			throw new UnknownIdentifierException("No id was found, which is necessary when updating a campaign");
+
+		if (errors.hasErrors())
+			throw new ValidationException("Validation errors where encountered when updating a campaign", errors);
 
 		campaignFactory.createCampaignModel(campaignForm).ifPresent(campaign -> {
 			campaign.setOwner(getSessionCampaignManager());

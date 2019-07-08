@@ -8,6 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.Optional;
 
 /**
  * Generic model for all campaign types to extend from, contains all the generic fields that should be applicable
@@ -55,19 +56,22 @@ public class Campaign {
 	protected Campaign() {}
 
 	public Campaign(final CampaignForm campaignForm) {
-		this.id = campaignForm.getId();
-		this.title = campaignForm.getTitle();
-		this.description = campaignForm.getDescription();
-		this.campaignImageFilePath = campaignForm.getCampaignImageFilePath();
-		this.type = campaignForm.getType();
-		this.state = campaignForm.getState();
-		this.startDate = LocalDate.parse(campaignForm.getStartDate());
-		this.endDate = LocalDate.parse(campaignForm.getEndDate());
-		this.quantity = Double.parseDouble(campaignForm.getQuantity());
-		this.showAfterExpiration = campaignForm.isShowAfterExpiration();
-		this.originalPrice = Double.parseDouble(campaignForm.getOriginalPrice());
-		this.percentDiscount = parseDouble(campaignForm.getPercentDiscount());
-		this.discountedPrice = parseDouble(campaignForm.getDiscountedPrice());
+		populate(campaignForm);
+	}
+
+	public void populate(final CampaignForm campaignForm) {
+		Optional.ofNullable(campaignForm.getTitle()).ifPresent(this::setTitle);
+		Optional.ofNullable(campaignForm.getDescription()).ifPresent(this::setDescription);
+		Optional.ofNullable(campaignForm.getCampaignImageFilePath()).ifPresent(this::setCampaignImageFilePath);
+		Optional.ofNullable(campaignForm.getType()).ifPresent(this::setType);
+		Optional.ofNullable(campaignForm.getState()).ifPresent(this::setState);
+		Optional.ofNullable(campaignForm.getStartDate()).ifPresent(s -> this.setStartDate(LocalDate.parse(s)));
+		Optional.ofNullable(campaignForm.getEndDate()).ifPresent(s -> this.setEndDate(LocalDate.parse(s)));
+		Optional.ofNullable(campaignForm.getQuantity()).ifPresent(s -> this.setQuantity(Double.valueOf(s)));
+		Optional.of(campaignForm.isShowAfterExpiration()).ifPresent(this::setShowAfterExpiration);
+		Optional.ofNullable(campaignForm.getOriginalPrice()).ifPresent(s -> this.setOriginalPrice(Double.valueOf(s)));
+		Optional.ofNullable(campaignForm.getPercentDiscount()).ifPresent(s -> this.setPercentDiscount(Double.valueOf(s)));
+		Optional.ofNullable(campaignForm.getDiscountedPrice()).ifPresent(s -> this.setDiscountedPrice(Double.valueOf(s)));
 	}
 
 	private Double parseDouble(final String str) {

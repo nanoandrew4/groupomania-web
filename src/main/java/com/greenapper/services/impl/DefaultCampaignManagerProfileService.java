@@ -2,8 +2,8 @@ package com.greenapper.services.impl;
 
 import com.greenapper.dtos.CampaignManagerProfileDTO;
 import com.greenapper.exceptions.NotFoundException;
-import com.greenapper.exceptions.UnknownIdentifierException;
 import com.greenapper.exceptions.ValidationException;
+import com.greenapper.forms.CampaignManagerProfileForm;
 import com.greenapper.models.CampaignManager;
 import com.greenapper.models.CampaignManagerProfile;
 import com.greenapper.repositories.CampaignManagerProfileRepository;
@@ -48,23 +48,22 @@ public class DefaultCampaignManagerProfileService implements CampaignManagerProf
 	}
 
 	@Override
-	public void updateProfile(final CampaignManagerProfile updatedProfile, final Errors errors) {
+	public void updateProfile(final CampaignManagerProfileForm updatedProfile, final Errors errors) {
+		final CampaignManager campaignManager = (CampaignManager) sessionService.getSessionUser();
+		final CampaignManagerProfile profile = campaignManagerProfileRepository.findById(campaignManager.getId()).orElseGet(CampaignManagerProfile::new);
+		profile.populate(updatedProfile);
+
 		campaignManagerProfileValidator.validate(updatedProfile, errors);
 
 		if (errors.hasErrors())
 			throw new ValidationException("Profile update for campaign manager with id: \'" + updatedProfile.getId() + "\' encountered validation errors", errors);
 
-		final Long sessionUserId = sessionService.getSessionUser().getId();
-		final CampaignManager campaignManager = campaignManagerRepository.findById(sessionUserId)
-				.orElseThrow(() -> new UnknownIdentifierException("Could not find user with id: \'" + sessionUserId + "\'"));
-		updatedProfile.setId(sessionUserId);
-
 		final String profileImagePath = fileSystemStorageService.saveImage(updatedProfile.getProfileImage());
-		Optional.ofNullable(profileImagePath).ifPresent(updatedProfile::setProfileImageFilePath);
+		Optional.ofNullable(profileImagePath).ifPresent(profile::setProfileImageFilePath);
 
-		campaignManager.setCampaignManagerProfile(updatedProfile);
+		campaignManager.setCampaignManagerProfile(profile);
 		campaignManagerRepository.save(campaignManager);
-		campaignManagerProfileRepository.save(updatedProfile);
+		campaignManagerProfileRepository.save(profile);
 		sessionService.setSessionUser(campaignManager);
 	}
 }

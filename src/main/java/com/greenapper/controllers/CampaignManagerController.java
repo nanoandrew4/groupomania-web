@@ -46,7 +46,9 @@ public class CampaignManagerController {
 			@ApiResponse(code = 401, message = "Authentication error", response = OAuthExceptionDTO.class)
 	})
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void updatePassword(@RequestBody @ApiParam(value = "Password update form") final PasswordUpdateForm passwordUpdateForm, @ApiIgnore final Errors errors) {
+	public void updatePassword(
+			@RequestBody @ApiParam(value = "Password update form", required = true) final PasswordUpdateForm passwordUpdateForm,
+			@ApiIgnore final Errors errors) {
 		LOG.info("Updating password for session campaign manager");
 		campaignManagerService.updatePassword(passwordUpdateForm, errors);
 	}
