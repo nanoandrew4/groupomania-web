@@ -49,14 +49,14 @@ public class DefaultCampaignManagerProfileService implements CampaignManagerProf
 
 	@Override
 	public void updateProfile(final CampaignManagerProfileForm updatedProfile, final Errors errors) {
-		final CampaignManager campaignManager = (CampaignManager) sessionService.getSessionUser();
-		final CampaignManagerProfile profile = campaignManagerProfileRepository.findById(campaignManager.getId()).orElseGet(CampaignManagerProfile::new);
-		profile.populate(updatedProfile);
-
 		campaignManagerProfileValidator.validate(updatedProfile, errors);
 
 		if (errors.hasErrors())
 			throw new ValidationException("Profile update for campaign manager with id: \'" + updatedProfile.getId() + "\' encountered validation errors", errors);
+
+		final CampaignManager campaignManager = (CampaignManager) sessionService.getSessionUser();
+		final CampaignManagerProfile profile = campaignManagerProfileRepository.findById(campaignManager.getId()).orElseGet(CampaignManagerProfile::new);
+		profile.populate(updatedProfile);
 
 		final String profileImagePath = fileSystemStorageService.saveImage(updatedProfile.getProfileImage());
 		Optional.ofNullable(profileImagePath).ifPresent(profile::setProfileImageFilePath);

@@ -9,6 +9,7 @@ import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,7 +45,7 @@ public class DefaultCampaignController {
 			@ApiResponse(code = 404, message = "Campaign not found, or not publicly visible", response = ErrorDTO.class)
 	})
 	public CampaignDTO getCampaignById(
-			@PathVariable @ApiParam(value = "ID of the campaign to retrieve", required = true) final Long id) {
+			@PathVariable @ApiParam(value = "ID of the campaign to retrieve") final Long id) {
 		final Optional<CampaignDTO> campaignDTO = campaignService.getCampaignById(id);
 
 		if (campaignDTO.isPresent() && !isCampaignUnlisted(campaignDTO.get()))
@@ -74,11 +75,12 @@ public class DefaultCampaignController {
 	@PatchMapping("/state/{id}/{state}")
 	@ApiOperation(value = "Updates the state of an existing campaign to the newly supplied value")
 	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Campaign state updated successfully"),
+			@ApiResponse(code = 204, message = "Campaign state updated successfully"),
 			@ApiResponse(code = 404, message = "Specified campaign not found", response = ErrorDTO.class)
 	})
+	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void updateCampaignState(
-			@PathVariable @ApiParam(value = "ID of the campaign whose state to modify", required = true) final Long id,
+			@PathVariable @ApiParam(value = "ID of the campaign whose state to modify") final Long id,
 			@PathVariable @ApiParam(value = "New state to associate with the specified campaign", required = true, allowableValues = "active,inactive,archive") final String state) {
 		LOG.info("Updating campaign state for campaign with id: \'" + id + "\'. New state is: \'" + state + "\'");
 		campaignService.updateCampaignState(id, state);
