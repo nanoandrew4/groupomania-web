@@ -7,6 +7,9 @@ import com.greenapper.models.CampaignManager;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -27,12 +30,15 @@ public class Campaign {
 	@JoinColumn(name = "owner_id")
 	private CampaignManager owner;
 
+	@NotBlank
 	private String title;
 
+	@NotBlank
 	private String description;
 
 	private String campaignImageFilePath;
 
+	@NotNull
 	private CampaignType type;
 
 	@DateTimeFormat(pattern = "yyyy-mm-dd")
@@ -41,16 +47,20 @@ public class Campaign {
 	@DateTimeFormat(pattern = "yyyy-mm-dd")
 	private LocalDate endDate;
 
+	@NotNull
+	@Min(1)
 	private Double quantity = Double.POSITIVE_INFINITY;
 
 	private boolean showAfterExpiration;
 
+	@NotNull
 	private Double originalPrice;
 
 	private Double percentDiscount;
 
 	private Double discountedPrice;
 
+	@NotNull
 	private CampaignState state;
 
 	protected Campaign() {}
@@ -60,6 +70,7 @@ public class Campaign {
 	}
 
 	public void populate(final CampaignForm campaignForm) {
+		Optional.ofNullable(campaignForm.getId()).ifPresent(this::setId);
 		Optional.ofNullable(campaignForm.getTitle()).ifPresent(this::setTitle);
 		Optional.ofNullable(campaignForm.getDescription()).ifPresent(this::setDescription);
 		Optional.ofNullable(campaignForm.getCampaignImageFilePath()).ifPresent(this::setCampaignImageFilePath);
@@ -67,11 +78,11 @@ public class Campaign {
 		Optional.ofNullable(campaignForm.getState()).ifPresent(this::setState);
 		Optional.ofNullable(campaignForm.getStartDate()).ifPresent(s -> this.setStartDate(LocalDate.parse(s)));
 		Optional.ofNullable(campaignForm.getEndDate()).ifPresent(s -> this.setEndDate(LocalDate.parse(s)));
-		Optional.ofNullable(campaignForm.getQuantity()).ifPresent(s -> this.setQuantity(Double.valueOf(s)));
+		Optional.ofNullable(campaignForm.getQuantity()).ifPresent(s -> this.setQuantity(parseDouble(s)));
 		Optional.of(campaignForm.isShowAfterExpiration()).ifPresent(this::setShowAfterExpiration);
-		Optional.ofNullable(campaignForm.getOriginalPrice()).ifPresent(s -> this.setOriginalPrice(Double.valueOf(s)));
-		Optional.ofNullable(campaignForm.getPercentDiscount()).ifPresent(s -> this.setPercentDiscount(Double.valueOf(s)));
-		Optional.ofNullable(campaignForm.getDiscountedPrice()).ifPresent(s -> this.setDiscountedPrice(Double.valueOf(s)));
+		Optional.ofNullable(campaignForm.getOriginalPrice()).ifPresent(s -> this.setOriginalPrice(parseDouble(s)));
+		Optional.ofNullable(campaignForm.getPercentDiscount()).ifPresent(s -> this.setPercentDiscount(parseDouble(s)));
+		Optional.ofNullable(campaignForm.getDiscountedPrice()).ifPresent(s -> this.setDiscountedPrice(parseDouble(s)));
 	}
 
 	private Double parseDouble(final String str) {

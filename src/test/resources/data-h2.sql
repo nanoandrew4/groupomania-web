@@ -8,11 +8,11 @@ insert into users (id, username, password, password_change_required) values
 insert into campaign_manager (id) values
 (1),(2),(3);
 
-insert into campaign (id, title, description, type, state, start_date, end_date, show_after_expiration, quantity, original_price, percent_discount) values
-(1, 'Offer campaign', 'Test offer campaign', 1, 0, '2019-07-02', '2019-07-04', 'true', 'Infinity', 20, 33),
-(2, 'Coupon campaign', 'Sample description', 0, 0, '2019-07-01', '2019-07-05', 'true', 100, 10, 33),
-(3, 'Exipred campaign', 'Expired and invisible campaign', 1, 0, '2019-06-25', '2019-06-28', 'false', 'Infinity', 20, 33),
-(4, 'Coupon campaign', 'Sample description', 0, 0, '2019-07-01', '2019-07-05', 'true', 100, 10, 33);
+insert into campaign (id, title, description, type, state, start_date, end_date, show_after_expiration, quantity, original_price, percent_discount, owner_id) values
+(1, 'Offer campaign', 'Test offer campaign', 1, 0, '2030-07-02', '2030-07-04', 'true', 'Infinity', 20, 33, 1),
+(2, 'Coupon campaign', 'Sample description', 0, 0, '2030-07-01', '2030-07-05', 'true', 100, 10, 33, 1),
+(3, 'Exipred campaign', 'Expired and invisible campaign', 1, 0, '2030-06-25', '2030-06-28', 'false', 'Infinity', 20, 33, 1),
+(4, 'Coupon campaign', 'Sample description', 0, 0, '2030-07-01', '2030-07-05', 'true', 100, 10, 33, 1);
 
 insert into offer_Campaign (id) values
 (1),

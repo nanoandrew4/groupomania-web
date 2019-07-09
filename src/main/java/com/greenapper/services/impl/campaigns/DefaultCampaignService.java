@@ -133,6 +133,15 @@ public abstract class DefaultCampaignService implements CampaignService {
 		campaignManagerService.addOrUpdateCampaignForCampaignManager(campaign);
 	}
 
+	private void updateCampaignForCampaignManager(final Campaign campaign) {
+		final List<Campaign> sessionUserCampaigns = ((CampaignManager) sessionService.getSessionUser()).getCampaigns();
+		final int oldCampaignIdx = sessionUserCampaigns.indexOf(campaign);
+
+		if (oldCampaignIdx < 1)
+			throw new UnknownIdentifierException("The campaign with id: \'" + campaign.getId() + "\' could not be found in the session users campaigns list");
+		sessionUserCampaigns.set(oldCampaignIdx, campaign);
+	}
+
 	private CampaignManager getSessionCampaignManager() {
 		return (CampaignManager) sessionService.getSessionUser();
 	}
