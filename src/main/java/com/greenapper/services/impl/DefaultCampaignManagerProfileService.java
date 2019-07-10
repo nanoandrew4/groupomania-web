@@ -63,7 +63,6 @@ public class DefaultCampaignManagerProfileService implements CampaignManagerProf
 
 		campaignManager.setCampaignManagerProfile(profile);
 		campaignManagerRepository.save(campaignManager);
-		campaignManagerProfileRepository.save(profile);
 		sessionService.setSessionUser(campaignManager);
 	}
 }

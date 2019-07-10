@@ -1,8 +1,11 @@
 package com.greenapper.forms;
 
 import com.greenapper.models.CampaignManager;
+import com.greenapper.models.CampaignManagerProfile;
 import com.greenapper.models.User;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Optional;
 
 public class CampaignManagerProfileForm {
 	private Long id;
@@ -16,6 +19,15 @@ public class CampaignManagerProfileForm {
 	private String address;
 
 	private MultipartFile profileImage;
+
+	private CampaignManagerProfileForm() {
+	}
+
+	public CampaignManagerProfileForm(final CampaignManagerProfile profile) {
+		Optional.ofNullable(profile.getName()).ifPresent(this::setName);
+		Optional.ofNullable(profile.getEmail()).ifPresent(this::setEmail);
+		Optional.ofNullable(profile.getAddress()).ifPresent(this::setAddress);
+	}
 
 	public Long getId() {
 		return id;

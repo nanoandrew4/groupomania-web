@@ -1,4 +1,4 @@
-package com.greenapper.factories;
+package com.greenapper.factories.campaign;
 
 import com.greenapper.forms.campaigns.CampaignForm;
 import com.greenapper.models.campaigns.Campaign;

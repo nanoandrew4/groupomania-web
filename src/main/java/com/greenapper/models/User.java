@@ -7,11 +7,7 @@ import java.util.Set;
 /**
  *
  */
-@Entity
-@Inheritance(
-		strategy = InheritanceType.JOINED
-)
-@Table(name = "Users")
+@MappedSuperclass
 public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

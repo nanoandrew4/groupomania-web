@@ -16,7 +16,7 @@ public class CampaignManagerProfile {
 
 	@OneToOne(fetch = FetchType.LAZY)
 	@MapsId
-	private User campaignManager;
+	private CampaignManager campaignManager;
 
 	private String name;
 
@@ -42,10 +42,10 @@ public class CampaignManagerProfile {
 	}
 
 	public CampaignManager getCampaignManager() {
-		return (CampaignManager) campaignManager;
+		return campaignManager;
 	}
 
-	public void setCampaignManager(User campaignManager) {
+	public void setCampaignManager(CampaignManager campaignManager) {
 		this.campaignManager = campaignManager;
 	}
 

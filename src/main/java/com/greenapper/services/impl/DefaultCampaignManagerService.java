@@ -3,7 +3,7 @@ package com.greenapper.services.impl;
 import com.greenapper.config.SecurityConfig;
 import com.greenapper.dtos.campaign.CampaignDTO;
 import com.greenapper.exceptions.ValidationException;
-import com.greenapper.factories.CampaignDTOFactory;
+import com.greenapper.factories.campaign.CampaignDTOFactory;
 import com.greenapper.forms.PasswordUpdateForm;
 import com.greenapper.models.CampaignManager;
 import com.greenapper.models.campaigns.Campaign;

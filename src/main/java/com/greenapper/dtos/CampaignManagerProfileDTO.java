@@ -5,8 +5,6 @@ import com.greenapper.models.CampaignManagerProfile;
 import com.greenapper.models.User;
 
 public class CampaignManagerProfileDTO {
-	private Long id;
-
 	private User campaignManager;
 
 	private String name;
@@ -18,16 +16,11 @@ public class CampaignManagerProfileDTO {
 	private String profileImageFilePath;
 
 	public CampaignManagerProfileDTO(final CampaignManagerProfile profile) {
-		this.id = profile.getId();
 		this.campaignManager = profile.getCampaignManager();
 		this.name = profile.getName();
 		this.email = profile.getEmail();
 		this.address = profile.getAddress();
 		this.profileImageFilePath = profile.getProfileImageFilePath();
-	}
-
-	public Long getId() {
-		return id;
 	}
 
 	public CampaignManager getCampaignManager() {

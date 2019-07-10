@@ -1,6 +1,6 @@
-package com.greenapper.factories.impl;
+package com.greenapper.factories.campaign.impl;
 
-import com.greenapper.factories.CampaignFactory;
+import com.greenapper.factories.campaign.CampaignFactory;
 import com.greenapper.forms.campaigns.CampaignForm;
 import com.greenapper.forms.campaigns.CouponCampaignForm;
 import com.greenapper.forms.campaigns.OfferCampaignForm;

@@ -4,8 +4,8 @@ import com.greenapper.dtos.campaign.CampaignDTO;
 import com.greenapper.enums.CampaignState;
 import com.greenapper.exceptions.UnknownIdentifierException;
 import com.greenapper.exceptions.ValidationException;
-import com.greenapper.factories.CampaignDTOFactory;
-import com.greenapper.factories.CampaignFactory;
+import com.greenapper.factories.campaign.CampaignDTOFactory;
+import com.greenapper.factories.campaign.CampaignFactory;
 import com.greenapper.forms.campaigns.CampaignForm;
 import com.greenapper.models.CampaignManager;
 import com.greenapper.models.campaigns.Campaign;
@@ -131,15 +131,6 @@ public abstract class DefaultCampaignService implements CampaignService {
 
 		campaignRepository.save(campaign);
 		campaignManagerService.addOrUpdateCampaignForCampaignManager(campaign);
-	}
-
-	private void updateCampaignForCampaignManager(final Campaign campaign) {
-		final List<Campaign> sessionUserCampaigns = ((CampaignManager) sessionService.getSessionUser()).getCampaigns();
-		final int oldCampaignIdx = sessionUserCampaigns.indexOf(campaign);
-
-		if (oldCampaignIdx < 1)
-			throw new UnknownIdentifierException("The campaign with id: \'" + campaign.getId() + "\' could not be found in the session users campaigns list");
-		sessionUserCampaigns.set(oldCampaignIdx, campaign);
 	}
 
 	private CampaignManager getSessionCampaignManager() {

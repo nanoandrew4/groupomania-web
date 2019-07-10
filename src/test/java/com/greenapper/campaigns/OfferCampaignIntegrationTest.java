@@ -4,7 +4,7 @@ import com.greenapper.Main;
 import com.greenapper.controllers.campaign.OfferCampaignController;
 import com.greenapper.enums.CampaignState;
 import com.greenapper.exceptions.ValidationException;
-import com.greenapper.factories.CampaignFormFactory;
+import com.greenapper.factories.campaign.CampaignFormFactory;
 import com.greenapper.forms.campaigns.CampaignForm;
 import com.greenapper.forms.campaigns.OfferCampaignForm;
 import com.greenapper.models.CampaignManager;
@@ -340,8 +340,6 @@ public class OfferCampaignIntegrationTest {
 			fail("Campaign to update was not found");
 		return campaignForm;
 	}
-
-//	private void performStandardPassAssertions(final Errors errors, final )
 
 	private void performStandardKOAssertions(final Errors errors, final List<String> expectedErrorCodes, final long initUserCampaignCount) {
 		assertEquals(initUserCampaignCount, ((CampaignManager) sessionService.getSessionUser()).getCampaigns().size());
