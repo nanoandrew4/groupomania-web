@@ -5,6 +5,8 @@ import com.greenapper.dtos.ValidationErrorDTO;
 import com.greenapper.exceptions.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -17,16 +19,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 	private Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+	@Autowired
+	private MessageSource messageSource;
+
 	@ExceptionHandler(RuntimeException.class)
-	public ResponseEntity handle(RuntimeException ex) {
+	public ResponseEntity handle(final RuntimeException ex) {
+		HttpStatus responseStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		try {
-			final HttpStatus responseStatus = ex.getClass().getAnnotation(ResponseStatus.class).code();
-			if (ex instanceof ValidationException)
-				return new ResponseEntity<>(new ValidationErrorDTO((ValidationException) ex), responseStatus);
-			return new ResponseEntity<>(new ErrorDTO(ex), responseStatus);
+			responseStatus = ex.getClass().getAnnotation(ResponseStatus.class).code();
 		} catch (NullPointerException e) {
 			LOG.error("Unhandled exception", ex);
-			return new ResponseEntity<>(new ErrorDTO(ex), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+
+		if (ex instanceof ValidationException)
+			return new ResponseEntity<>(new ValidationErrorDTO((ValidationException) ex), responseStatus);
+		return new ResponseEntity<>(new ErrorDTO(ex), responseStatus);
 	}
 }

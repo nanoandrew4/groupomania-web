@@ -1,4 +1,4 @@
-package com.greenapper.oauth;
+package com.greenapper.config;
 
 import com.greenapper.controllers.CampaignManagerController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,14 +36,13 @@ public class AuthServerOAuth2Config extends AuthorizationServerConfigurerAdapter
 	}
 
 	@Override
-	public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+	public void configure(AuthorizationServerSecurityConfigurer security) {
 		security.passwordEncoder(NoOpPasswordEncoder.getInstance());
 	}
 
 	// Allows use of password grant
 	@Override
-	public void configure(AuthorizationServerEndpointsConfigurer endpoints)
-			throws Exception {
+	public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
 		endpoints.authenticationManager(authenticationManager);
 	}
 }
