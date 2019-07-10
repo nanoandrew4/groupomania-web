@@ -72,7 +72,7 @@ public class OfferCampaignIntegrationTest {
 		campaignForm.setTitle(null);
 		try {
 			offerCampaignController.createCampaign(campaignForm, errors);
-			fail("Controller should have thrown an exception");
+			fail("ValidationException should have been thrown");
 		} catch (ValidationException e) {
 			performStandardKOAssertions(errors, Collections.singletonList("err.campaign.title"), initCampaignCount);
 		}
@@ -88,7 +88,7 @@ public class OfferCampaignIntegrationTest {
 		campaignForm.setDescription(null);
 		try {
 			offerCampaignController.createCampaign(campaignForm, errors);
-			fail("Contrller should have thrown an exception");
+			fail("ValidationException should have been thrown");
 		} catch (ValidationException e) {
 			performStandardKOAssertions(errors, Collections.singletonList("err.campaign.description"), initCampaignCount);
 		}
@@ -104,7 +104,7 @@ public class OfferCampaignIntegrationTest {
 		campaignForm.setType(null);
 		try {
 			offerCampaignController.createCampaign(campaignForm, errors);
-			fail("Expected InvalidCampaignTypeException to be thrown");
+			fail("ValidationException should have been thrown");
 		} catch (ValidationException e) {
 			performStandardKOAssertions(errors, Collections.singletonList("err.campaign.type"), initCampaignCount);
 		}
@@ -120,6 +120,7 @@ public class OfferCampaignIntegrationTest {
 		campaignForm.setQuantity("-1");
 		try {
 			offerCampaignController.createCampaign(campaignForm, errors);
+			fail("ValidationException should have been thrown");
 		} catch (ValidationException e) {
 			performStandardKOAssertions(errors, Collections.singletonList("err.campaign.quantity"), initCampaignCount);
 		}
@@ -135,6 +136,7 @@ public class OfferCampaignIntegrationTest {
 		campaignForm.setOriginalPrice(null);
 		try {
 			offerCampaignController.createCampaign(campaignForm, errors);
+			fail("ValidationException should have been thrown");
 		} catch (ValidationException e) {
 			performStandardKOAssertions(errors, Collections.singletonList("err.campaign.originalPrice"), initCampaignCount);
 		}
@@ -150,6 +152,7 @@ public class OfferCampaignIntegrationTest {
 		campaignForm.setOriginalPrice("-1");
 		try {
 			offerCampaignController.createCampaign(campaignForm, errors);
+			fail("ValidationException should have been thrown");
 		} catch (ValidationException e) {
 			final List<String> expectedErrorCodes = Lists.newArrayList("err.campaign.originalPrice", "err.campaign.discountedPriceLargerThanOriginal");
 			performStandardKOAssertions(errors, expectedErrorCodes, initCampaignCount);
@@ -166,6 +169,7 @@ public class OfferCampaignIntegrationTest {
 		campaignForm.setStartDate(null);
 		try {
 			offerCampaignController.createCampaign(campaignForm, errors);
+			fail("ValidationException should have been thrown");
 		} catch (ValidationException e) {
 			performStandardKOAssertions(errors, Collections.singletonList("err.campaign.startDate"), initCampaignCount);
 		}
@@ -181,6 +185,7 @@ public class OfferCampaignIntegrationTest {
 		campaignForm.setStartDate(String.valueOf(LocalDate.now().minus(5, ChronoUnit.DAYS)));
 		try {
 			offerCampaignController.createCampaign(campaignForm, errors);
+			fail("ValidationException should have been thrown");
 		} catch (ValidationException e) {
 			performStandardKOAssertions(errors, Collections.singletonList("err.campaign.startDate"), initCampaignCount);
 		}
@@ -196,6 +201,7 @@ public class OfferCampaignIntegrationTest {
 		campaignForm.setEndDate(null);
 		try {
 			offerCampaignController.createCampaign(campaignForm, errors);
+			fail("ValidationException should have been thrown");
 		} catch (ValidationException e) {
 			performStandardKOAssertions(errors, Collections.singletonList("err.campaign.endDate"), initCampaignCount);
 		}
@@ -211,6 +217,7 @@ public class OfferCampaignIntegrationTest {
 		campaignForm.setEndDate(String.valueOf(LocalDate.now().minus(5, ChronoUnit.DAYS)));
 		try {
 			offerCampaignController.createCampaign(campaignForm, errors);
+			fail("ValidationException should have been thrown");
 		} catch (ValidationException e) {
 			final List<String> expectedErrorCodes = Lists.newArrayList("err.campaign.endDate", "err.campaign.startDateAfterEndDate");
 			performStandardKOAssertions(errors, expectedErrorCodes, initCampaignCount);
@@ -227,6 +234,7 @@ public class OfferCampaignIntegrationTest {
 		campaignForm.setStartDate(String.valueOf(LocalDate.parse(campaignForm.getEndDate()).plus(5, ChronoUnit.DAYS)));
 		try {
 			offerCampaignController.createCampaign(campaignForm, errors);
+			fail("ValidationException should have been thrown");
 		} catch (ValidationException e) {
 			performStandardKOAssertions(errors, Collections.singletonList("err.campaign.startDateAfterEndDate"), initCampaignCount);
 		}
@@ -242,6 +250,7 @@ public class OfferCampaignIntegrationTest {
 		campaignForm.setEndDate(campaignForm.getStartDate());
 		try {
 			offerCampaignController.createCampaign(campaignForm, errors);
+			fail("ValidationException should have been thrown");
 		} catch (ValidationException e) {
 			performStandardKOAssertions(errors, Collections.singletonList("err.campaign.startDateAfterEndDate"), initCampaignCount);
 		}
@@ -258,6 +267,7 @@ public class OfferCampaignIntegrationTest {
 		campaignForm.setPercentDiscount(null);
 		try {
 			offerCampaignController.createCampaign(campaignForm, errors);
+			fail("ValidationException should have been thrown");
 		} catch (ValidationException e) {
 			performStandardKOAssertions(errors, Collections.singletonList("err.campaign.offer.discountedPriceOrPercent"), initCampaignCount);
 		}
