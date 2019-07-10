@@ -7,7 +7,6 @@ import com.greenapper.models.campaigns.Campaign;
 import org.springframework.validation.Errors;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Service that contains all business logic pertaining to {@link Campaign} and its subclasses.
@@ -64,7 +63,7 @@ public interface CampaignService {
 	 * @param id ID of the campaign to retrieve
 	 * @return The retrieved campaign converted to a DTO and wrapped in an optional
 	 */
-	Optional<CampaignDTO> getCampaignById(final Long id);
+	CampaignDTO getCampaignById(final Long id);
 
 	/**
 	 * Returns a {@link Campaign} given its ID if it belongs to the session user, converted to a DTO,
@@ -73,7 +72,7 @@ public interface CampaignService {
 	 * @param id ID of the campaign to retrieve for the session user
 	 * @return The retrieved campaign, converted to a DTO and wrapped in an optional
 	 */
-	Optional<CampaignDTO> getCampaignByIdForSessionUser(final Long id);
+	CampaignDTO getCampaignByIdForSessionUser(final Long id);
 
 	/**
 	 * Retrieves all stored campaigns.

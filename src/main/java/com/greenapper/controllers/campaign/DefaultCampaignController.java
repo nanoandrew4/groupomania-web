@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/campaigns")
@@ -46,11 +45,11 @@ public class DefaultCampaignController {
 	})
 	public CampaignDTO getCampaignById(
 			@PathVariable @ApiParam(value = "ID of the campaign to retrieve") final Long id) {
-		final Optional<CampaignDTO> campaignDTO = campaignService.getCampaignById(id);
+		final CampaignDTO campaignDTO = campaignService.getCampaignById(id);
 
-		if (campaignDTO.isPresent() && !isCampaignUnlisted(campaignDTO.get()))
-			return campaignDTO.orElse(null);
-		return campaignService.getCampaignByIdForSessionUser(id).orElse(null);
+		if (!isCampaignUnlisted(campaignDTO))
+			return campaignDTO;
+		return campaignService.getCampaignByIdForSessionUser(id);
 	}
 
 	/**

@@ -100,14 +100,16 @@ public abstract class DefaultCampaignService implements CampaignService {
 	}
 
 	@Override
-	public Optional<CampaignDTO> getCampaignById(final Long id) {
-		return campaignRepository.findById(id).map(campaignDTOFactory::createCampaignDTO);
+	public CampaignDTO getCampaignById(final Long id) {
+		return campaignRepository.findById(id).map(campaignDTOFactory::createCampaignDTO)
+				.orElseThrow(() -> new UnknownIdentifierException("Campaign with id: \'" + id + "\' could not be found"));
 	}
 
 	@Override
-	public Optional<CampaignDTO> getCampaignByIdForSessionUser(final Long id) {
+	public CampaignDTO getCampaignByIdForSessionUser(final Long id) {
 		final Predicate<Campaign> filterByOwner = campaign -> campaign.getOwner().getId().equals(sessionService.getSessionUser().getId());
-		return campaignRepository.findById(id).filter(filterByOwner).map(campaignDTOFactory::createCampaignDTO);
+		return campaignRepository.findById(id).filter(filterByOwner).map(campaignDTOFactory::createCampaignDTO)
+				.orElseThrow(() -> new UnknownIdentifierException("Campaign with id: \'" + id + "\' does not belong to the session user"));
 	}
 
 	@Override

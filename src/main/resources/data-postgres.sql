@@ -6,7 +6,7 @@ insert into groupomania_schema.campaign_manager (username, password, password_ch
 insert into groupomania_schema.campaign (title, description, type, state, start_date, end_date, show_after_expiration, quantity, original_price, percent_discount, owner_id) values
 ('Offer campaign', 'Test offer campaign', 1, 0, '2019-07-02', '2019-07-04', 'true', 'Infinity', 20, 33, 3),
 ('Coupon campaign', 'Sample description', 0, 0, '2019-07-01', '2019-07-05', 'true', 100, 10, 33, 3),
-('Exipred campaign', 'Expired and visible campaign', 1, 0, '2019-06-25', '2019-06-28', 'true', 'Infinity', 20, 33, 3);
+('Expired campaign', 'Expired and visible campaign', 1, 0, '2019-06-25', '2019-06-28', 'true', 'Infinity', 20, 33, 3);
 
 insert into groupomania_schema.campaign_manager_profile(campaign_manager_id, name, email, address) values
 (1, 'admin profile', 'admin@test.com', 'admin address'),
