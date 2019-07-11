@@ -120,7 +120,7 @@ public abstract class BaseCampaignController {
 	 * @return True if the the campaign should be unlisted, false if the campaign should be publicly visible
 	 */
 	private boolean isCampaignUnlisted(final Campaign campaign) {
-		return campaign.getState() == CampaignState.INACTIVE
+		return campaign.getState() == CampaignState.INACTIVE || campaign.getState() == CampaignState.ARCHIVED
 			   || (campaign.isShowAfterExpiration() && LocalDate.now().isAfter(campaign.getEndDate().plus(4, ChronoUnit.DAYS)))
 			   || (!campaign.isShowAfterExpiration() && LocalDate.now().isAfter(campaign.getEndDate()));
 

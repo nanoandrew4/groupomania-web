@@ -39,7 +39,11 @@ public class CouponCampaignFormValidator implements Validator {
 		CampaignFormValidator.rejectDateIfBeforeOtherDate(couponCampaignForm.getCouponStartDate(), couponCampaignForm.getStartDate(), "err.campaign.coupon.couponStartDateBeforeCampaign", errors);
 		CampaignFormValidator.rejectDateIfAfterOtherDate(couponCampaignForm.getCouponEndDate(), couponCampaignForm.getEndDate(), "err.campaign.coupon.couponEndDateBeforeCampaign", errors);
 
-		if (couponCampaignForm.getDiscountedPrice() == null && couponCampaignForm.getPercentDiscount() == null && (couponCampaignForm.getCouponDescription() == null || couponCampaignForm.getCouponDescription().trim().isEmpty()))
+		if (isEmpty(couponCampaignForm.getDiscountedPrice()) && isEmpty(couponCampaignForm.getPercentDiscount()) && isEmpty(couponCampaignForm.getCouponDescription()))
 			errors.reject("err.campaign.coupon.discountedPriceOrPercentOrDescription");
+	}
+
+	private boolean isEmpty(final String str) {
+		return str == null || str.trim().isEmpty();
 	}
 }
