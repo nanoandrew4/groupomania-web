@@ -88,13 +88,13 @@ public class DefaultCampaignController {
 	/**
 	 * Determines if a campaign should be publicly visible.
 	 *
-	 * @param campaign Campaign for which to determine if it should be publicly visible or not
+	 * @param campaignDTO Campaign for which to determine if it should be publicly visible or not
 	 * @return True if the the campaign should be unlisted, false if the campaign should be publicly visible
 	 */
-	private boolean isCampaignUnlisted(final CampaignDTO campaign) {
-		return campaign.getState() == CampaignState.INACTIVE
-			   || (campaign.isShowAfterExpiration() && LocalDate.now().isAfter(LocalDate.parse(campaign.getEndDate()).plus(4, ChronoUnit.DAYS)))
-			   || (!campaign.isShowAfterExpiration() && LocalDate.now().isAfter(LocalDate.parse(campaign.getEndDate())));
+	private boolean isCampaignUnlisted(final CampaignDTO campaignDTO) {
+		return campaignDTO.getState() == CampaignState.INACTIVE || campaignDTO.getState() == CampaignState.ARCHIVED
+			   || (campaignDTO.isShowAfterExpiration() && LocalDate.now().isAfter(LocalDate.parse(campaignDTO.getEndDate()).plus(4, ChronoUnit.DAYS)))
+			   || (!campaignDTO.isShowAfterExpiration() && LocalDate.now().isAfter(LocalDate.parse(campaignDTO.getEndDate())));
 
 	}
 }
