@@ -3,7 +3,6 @@ package com.greenapper.dtos.campaign;
 import com.greenapper.enums.CampaignState;
 import com.greenapper.enums.CampaignType;
 import com.greenapper.models.campaigns.Campaign;
-import org.springframework.web.multipart.MultipartFile;
 
 public class CampaignDTO {
 	private Long id;
@@ -11,8 +10,6 @@ public class CampaignDTO {
 	private String title;
 
 	private String description;
-
-	private MultipartFile campaignImage;
 
 	private String campaignImageFilePath;
 
@@ -75,14 +72,6 @@ public class CampaignDTO {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public MultipartFile getCampaignImage() {
-		return campaignImage;
-	}
-
-	public void setCampaignImage(MultipartFile campaignImage) {
-		this.campaignImage = campaignImage;
 	}
 
 	public CampaignType getType() {

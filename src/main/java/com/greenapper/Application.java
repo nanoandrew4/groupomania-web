@@ -25,8 +25,7 @@ public class Application extends ResourceServerConfigurerAdapter {
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests().
-				antMatchers(AUTH_WHITELIST).permitAll().  // whitelist Swagger UI resources
-				antMatchers("/**").authenticated();  // require authentication for any endpoint that's not whitelisted
+				antMatchers("/").permitAll();  // require authentication for any endpoint that's not whitelisted
 	}
 
 	public static void main(String... args) {

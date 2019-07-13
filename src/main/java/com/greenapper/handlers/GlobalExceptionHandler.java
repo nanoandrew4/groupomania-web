@@ -10,6 +10,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -33,7 +34,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	public ResponseEntity handle(final RuntimeException ex) {
 		HttpStatus responseStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		try {
-			responseStatus = ex.getClass().getAnnotation(ResponseStatus.class).code();
+			if (ex instanceof AccessDeniedException)
+				responseStatus = HttpStatus.UNAUTHORIZED;
+			else
+				responseStatus = ex.getClass().getAnnotation(ResponseStatus.class).code();
 		} catch (NullPointerException e) {
 			LOG.error("Unhandled exception", ex);
 		}
