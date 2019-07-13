@@ -10,7 +10,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.R
 @SpringBootApplication
 @EnableResourceServer
 @ComponentScan("com.greenapper")
-public class Main extends ResourceServerConfigurerAdapter {
+public class Application extends ResourceServerConfigurerAdapter {
 
 	private static final String[] AUTH_WHITELIST = {
 			"/v2/api-docs",
@@ -30,6 +30,6 @@ public class Main extends ResourceServerConfigurerAdapter {
 	}
 
 	public static void main(String... args) {
-		SpringApplication.run(Main.class, args);
+		SpringApplication.run(Application.class, args);
 	}
 }

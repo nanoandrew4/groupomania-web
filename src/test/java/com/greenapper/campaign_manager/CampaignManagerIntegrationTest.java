@@ -1,6 +1,6 @@
 package com.greenapper.campaign_manager;
 
-import com.greenapper.Main;
+import com.greenapper.Application;
 import com.greenapper.controllers.CampaignManagerController;
 import com.greenapper.exceptions.ValidationException;
 import com.greenapper.forms.PasswordUpdateForm;
@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest(
 		webEnvironment = SpringBootTest.WebEnvironment.MOCK,
-		classes = Main.class
+		classes = Application.class
 )
 @TestPropertySource(locations = "classpath:application-test.properties")
 public class CampaignManagerIntegrationTest {

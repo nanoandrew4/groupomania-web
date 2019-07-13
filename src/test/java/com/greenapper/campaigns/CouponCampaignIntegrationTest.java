@@ -1,6 +1,6 @@
 package com.greenapper.campaigns;
 
-import com.greenapper.Main;
+import com.greenapper.Application;
 import com.greenapper.controllers.campaign.CouponCampaignController;
 import com.greenapper.enums.CampaignState;
 import com.greenapper.exceptions.ValidationException;
@@ -37,7 +37,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest(
 		webEnvironment = SpringBootTest.WebEnvironment.MOCK,
-		classes = Main.class
+		classes = Application.class
 )
 @TestPropertySource(locations = "classpath:application-test.properties")
 public class CouponCampaignIntegrationTest {
