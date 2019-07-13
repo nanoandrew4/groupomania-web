@@ -43,11 +43,13 @@ public class PasswordUpdateValidator extends GlobalValidator implements Validato
 		final User sessionUser = sessionService.getSessionUser();
 		final PasswordEncoder pwdEncoder = securityConfig.getPasswordEncoder();
 
-		if (!pwdEncoder.matches(passwordUpdateForm.getOldPassword(), sessionUser.getPassword()))
-			errors.reject("err.password.mismatch");
-		else if (pwdEncoder.matches(passwordUpdateForm.getNewPassword(), sessionUser.getPassword()))
-			errors.reject("err.password.samepassword");
+		if (!passwordUpdateForm.getNewPassword().equals(passwordUpdateForm.getConfirmNewPassword()))
+			errors.reject("err.password.newpassword.mismatch");
 		else if (passwordUpdateForm.getNewPassword().length() < 6)
 			errors.reject("err.password.length");
+		if (!pwdEncoder.matches(passwordUpdateForm.getOldPassword(), sessionUser.getPassword()))
+			errors.reject("err.password.mismatch");
+		if (pwdEncoder.matches(passwordUpdateForm.getNewPassword(), sessionUser.getPassword()))
+			errors.reject("err.password.samepassword");
 	}
 }

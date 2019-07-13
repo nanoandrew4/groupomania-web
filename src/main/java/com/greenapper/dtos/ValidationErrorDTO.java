@@ -22,4 +22,8 @@ public class ValidationErrorDTO extends ErrorDTO {
 	public List<String> getValidationErrors() {
 		return validationErrors;
 	}
+
+	public void setValidationErrors(final List<String> validationErrors) {
+		this.validationErrors = validationErrors;
+	}
 }

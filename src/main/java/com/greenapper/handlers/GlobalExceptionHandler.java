@@ -7,12 +7,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
@@ -21,6 +26,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@Autowired
 	private MessageSource messageSource;
+
+	private final Function<String, String> convertErrorMessage = s -> messageSource.getMessage(s, null, LocaleContextHolder.getLocale());
 
 	@ExceptionHandler(RuntimeException.class)
 	public ResponseEntity handle(final RuntimeException ex) {
@@ -31,8 +38,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			LOG.error("Unhandled exception", ex);
 		}
 
-		if (ex instanceof ValidationException)
-			return new ResponseEntity<>(new ValidationErrorDTO((ValidationException) ex), responseStatus);
+		if (ex instanceof ValidationException) {
+			final ValidationErrorDTO validationErrorDTO = new ValidationErrorDTO((ValidationException) ex);
+			final List<String> convertedErrors = validationErrorDTO.getValidationErrors().stream().map(convertErrorMessage).collect(Collectors.toList());
+			validationErrorDTO.setValidationErrors(convertedErrors);
+			return new ResponseEntity<>(validationErrorDTO, responseStatus);
+		}
 		return new ResponseEntity<>(new ErrorDTO(ex), responseStatus);
 	}
 }

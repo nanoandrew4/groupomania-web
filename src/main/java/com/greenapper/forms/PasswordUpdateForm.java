@@ -8,6 +8,8 @@ public class PasswordUpdateForm {
 
 	private String newPassword;
 
+	private String confirmNewPassword;
+
 	public String getOldPassword() {
 		return oldPassword;
 	}
@@ -22,5 +24,13 @@ public class PasswordUpdateForm {
 
 	public void setNewPassword(String newPassword) {
 		this.newPassword = newPassword;
+	}
+
+	public String getConfirmNewPassword() {
+		return confirmNewPassword;
+	}
+
+	public void setConfirmNewPassword(String confirmNewPassword) {
+		this.confirmNewPassword = confirmNewPassword;
 	}
 }
