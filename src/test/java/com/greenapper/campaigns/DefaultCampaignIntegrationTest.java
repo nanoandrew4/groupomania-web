@@ -85,7 +85,7 @@ public class DefaultCampaignIntegrationTest {
 	public void getAllVisibleCampaigns() {
 		final List<CampaignDTO> visibleCampaigns = defaultCampaignController.getAllVisibleCampaigns();
 
-		assertEquals(3, visibleCampaigns.size());
+		assertEquals(2, visibleCampaigns.size());
 	}
 
 	@Test

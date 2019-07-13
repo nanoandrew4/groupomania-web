@@ -51,6 +51,7 @@ public class CampaignManagerIntegrationTest {
 		final Errors errors = new BeanPropertyBindingResult(passwordUpdateForm, "passwordUpdateForm");
 		passwordUpdateForm.setOldPassword("wrongpass");
 		passwordUpdateForm.setNewPassword("12345678");
+		passwordUpdateForm.setConfirmNewPassword("12345678");
 
 		try {
 			campaignManagerController.updatePassword(passwordUpdateForm, errors);
@@ -67,6 +68,7 @@ public class CampaignManagerIntegrationTest {
 		final Errors errors = new BeanPropertyBindingResult(passwordUpdateForm, "passwordUpdateForm");
 		passwordUpdateForm.setOldPassword("testing");
 		passwordUpdateForm.setNewPassword("12345");
+		passwordUpdateForm.setConfirmNewPassword("12345");
 
 		try {
 			campaignManagerController.updatePassword(passwordUpdateForm, errors);
@@ -83,6 +85,7 @@ public class CampaignManagerIntegrationTest {
 		final Errors errors = new BeanPropertyBindingResult(passwordUpdateForm, "passwordUpdateForm");
 		passwordUpdateForm.setOldPassword("testing");
 		passwordUpdateForm.setNewPassword("testing");
+		passwordUpdateForm.setConfirmNewPassword("testing");
 
 		try {
 			campaignManagerController.updatePassword(passwordUpdateForm, errors);
@@ -100,6 +103,7 @@ public class CampaignManagerIntegrationTest {
 		final Errors errors = new BeanPropertyBindingResult(passwordUpdateForm, "passwordUpdateForm");
 		passwordUpdateForm.setOldPassword("testing");
 		passwordUpdateForm.setNewPassword("newpassword");
+		passwordUpdateForm.setConfirmNewPassword("newpassword");
 
 		campaignManagerController.updatePassword(passwordUpdateForm, errors);
 
