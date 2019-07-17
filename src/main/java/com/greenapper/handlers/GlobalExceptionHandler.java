@@ -36,8 +36,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		try {
 			if (ex instanceof AccessDeniedException)
 				responseStatus = HttpStatus.UNAUTHORIZED;
-			else
-				responseStatus = ex.getClass().getAnnotation(ResponseStatus.class).code();
+			else {
+				final HttpStatus annotationCode = ex.getClass().getAnnotation(ResponseStatus.class).code();
+				final HttpStatus annotationValue = ex.getClass().getAnnotation(ResponseStatus.class).value();
+
+				if (annotationCode != HttpStatus.INTERNAL_SERVER_ERROR)
+					responseStatus = annotationCode;
+				else if (annotationValue != HttpStatus.INTERNAL_SERVER_ERROR)
+					responseStatus = annotationValue;
+			}
 		} catch (NullPointerException e) {
 			LOG.error("Unhandled exception", ex);
 		}

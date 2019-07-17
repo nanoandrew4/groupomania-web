@@ -11,21 +11,9 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.R
 @EnableResourceServer
 @ComponentScan("com.greenapper")
 public class Application extends ResourceServerConfigurerAdapter {
-
-	private static final String[] AUTH_WHITELIST = {
-			"/v2/api-docs",
-			"/swagger-resources",
-			"/swagger-resources/**",
-			"/configuration/ui",
-			"/configuration/security",
-			"/swagger-ui.html",
-			"/webjars/**"
-	};
-
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests().
-				antMatchers("/").permitAll();  // require authentication for any endpoint that's not whitelisted
+		http.authorizeRequests().antMatchers("/").permitAll();
 	}
 
 	public static void main(String... args) {

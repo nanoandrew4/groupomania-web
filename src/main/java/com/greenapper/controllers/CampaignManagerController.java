@@ -38,7 +38,7 @@ public class CampaignManagerController {
 	@Autowired
 	private CampaignManagerService campaignManagerService;
 
-	@PatchMapping(PASSWORD_UPDATE_URI)
+	@PutMapping(PASSWORD_UPDATE_URI)
 	@ApiOperation(value = "Endpoint which serves to update the password of campaign manager")
 	@ApiResponses(value = {
 			@ApiResponse(code = 204, message = "Password updated successfully"),

@@ -27,3 +27,7 @@ insert into groupomania_schema.users_authorities (user_id, authority_id) values
 (1, 1),
 (2, 1),
 (3, 1);
+
+insert into groupomania_schema.oauth_client_details (client_id, client_secret, scope, authorized_grant_types,
+   authorities, access_token_validity, refresh_token_validity) values
+('public_campaign_manager_client', '$c0808$xMZL8woVJtKRPJcXrZHGKiRlNl90nCJgRkZZf0xnqRM=$yJj/lgUQy8MJJxPSB0J5H1fCuyfYISTJ7bkynwPOaAw=', 'read,write', 'password,refresh_token', null, 36000, 2592000);
