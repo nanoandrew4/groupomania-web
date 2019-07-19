@@ -71,7 +71,7 @@ public class DefaultCampaignController {
 	}
 
 	@Secured("ROLE_CAMPAIGN_MANAGER")
-	@PatchMapping("/state/{id}/{state}")
+	@PutMapping("/state/{id}/{state}")
 	@ApiOperation(value = "Updates the state of an existing campaign to the newly supplied value")
 	@ApiResponses(value = {
 			@ApiResponse(code = 204, message = "Campaign state updated successfully"),

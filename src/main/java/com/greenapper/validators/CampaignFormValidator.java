@@ -124,7 +124,7 @@ public class CampaignFormValidator implements Validator {
 		rejectDateIfEqualOrAfterOtherDate(campaignForm.getStartDate(), campaignForm.getEndDate(), "err.campaign.startDateAfterEndDate", errors);
 
 		if (campaignForm.getCampaignImage() != null && campaignForm.getCampaignImage().getSize() > 0 &&
-			(campaignForm.getCampaignImage().getContentType() == null || !campaignForm.getCampaignImage().getContentType().contains("image")))
+			(campaignForm.getCampaignImage().getType() == null || !campaignForm.getCampaignImage().getType().contains("image")))
 			errors.reject("err.campaign.imageFormat");
 
 		final Double discountedPrice = parseDouble(campaignForm.getDiscountedPrice());

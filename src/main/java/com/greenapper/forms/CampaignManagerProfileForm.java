@@ -3,7 +3,6 @@ package com.greenapper.forms;
 import com.greenapper.models.CampaignManager;
 import com.greenapper.models.CampaignManagerProfile;
 import com.greenapper.models.User;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -18,7 +17,7 @@ public class CampaignManagerProfileForm {
 
 	private String address;
 
-	private MultipartFile profileImage;
+	private ImageForm profileImage;
 
 	private CampaignManagerProfileForm() {
 	}
@@ -69,11 +68,11 @@ public class CampaignManagerProfileForm {
 		this.address = address;
 	}
 
-	public MultipartFile getProfileImage() {
+	public ImageForm getProfileImage() {
 		return profileImage;
 	}
 
-	public void setProfileImage(MultipartFile profileImage) {
+	public void setProfileImage(ImageForm profileImage) {
 		this.profileImage = profileImage;
 	}
 }

@@ -2,8 +2,8 @@ package com.greenapper.forms.campaigns;
 
 import com.greenapper.enums.CampaignState;
 import com.greenapper.enums.CampaignType;
+import com.greenapper.forms.ImageForm;
 import com.greenapper.models.campaigns.Campaign;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Generic campaign form to be sent from the frontend to the backend. Numeric and date fields are stored as strings,
@@ -16,7 +16,7 @@ public class CampaignForm {
 
 	private String description;
 
-	private MultipartFile campaignImage;
+	private ImageForm campaignImage;
 
 	private String campaignImageFilePath;
 
@@ -81,11 +81,11 @@ public class CampaignForm {
 		this.description = description;
 	}
 
-	public MultipartFile getCampaignImage() {
+	public ImageForm getCampaignImage() {
 		return campaignImage;
 	}
 
-	public void setCampaignImage(MultipartFile campaignImage) {
+	public void setCampaignImage(ImageForm campaignImage) {
 		this.campaignImage = campaignImage;
 	}
 

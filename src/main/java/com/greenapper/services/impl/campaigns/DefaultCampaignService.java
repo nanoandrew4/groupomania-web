@@ -107,7 +107,7 @@ public abstract class DefaultCampaignService implements CampaignService {
 
 	@Override
 	public CampaignDTO getCampaignByIdForSessionUser(final Long id) {
-		final Predicate<Campaign> filterByOwner = campaign -> campaign.getOwner().getId().equals(sessionService.getSessionUser().getId());
+		final Predicate<Campaign> filterByOwner = campaign -> campaign.getOwner().equals(sessionService.getSessionUser());
 		return campaignRepository.findById(id).filter(filterByOwner).map(campaignDTOFactory::createCampaignDTO)
 				.orElseThrow(() -> new UnknownIdentifierException("Campaign with id: \'" + id + "\' does not belong to the session user"));
 	}

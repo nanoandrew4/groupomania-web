@@ -1,6 +1,7 @@
 package com.greenapper.services.impl;
 
 import com.greenapper.exceptions.UnknownIdentifierException;
+import com.greenapper.forms.ImageForm;
 import com.greenapper.services.FileSystemStorageService;
 import com.greenapper.services.SessionService;
 import org.slf4j.Logger;
@@ -8,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -49,16 +49,17 @@ public class DefaultFileSystemStorageService implements FileSystemStorageService
 	}
 
 	@Override
-	public String saveImage(final MultipartFile image) {
+	public String saveImage(final ImageForm image) {
 		if (image != null && image.getSize() > 0) {
-			final String contentType = Objects.requireNonNull(image.getContentType()).replace("image/", "");
+			final String contentType = Objects.requireNonNull(image.getType()).replace("image/", "");
 			String relativeStoragePath = "";
 			try {
 				/*
 				 * Files are stored in a directory named after the hashed username, and the file name itself is hashed,
 				 * so that anonymous users cannot trivially retrieve any stored file.
 				 */
-				String hashedFileName = new String(Base64.getEncoder().encode(md.digest(image.getBytes()))).replaceAll("/", "?");
+				String hashedFileName = new String(Base64.getEncoder().encode(md.digest(image.getBytes())))
+						.replaceAll("/", "?").replaceAll("\\+", "?");
 				hashedFileName += "." + contentType;
 
 				relativeStoragePath = getSessionUsernameHash() + "/" + hashedFileName;
@@ -93,6 +94,7 @@ public class DefaultFileSystemStorageService implements FileSystemStorageService
 	}
 
 	private String getSessionUsernameHash() {
-		return new String(Base64.getEncoder().encode(md.digest(sessionService.getSessionUser().getUsername().getBytes()))).replaceAll("/", "?");
+		return new String(Base64.getEncoder().encode(md.digest(sessionService.getSessionUser().getUsername().getBytes())))
+				.replaceAll("/", "?").replaceAll("\\+", "?");
 	}
 }
