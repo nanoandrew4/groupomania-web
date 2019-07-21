@@ -14,6 +14,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -29,6 +31,7 @@ import static org.junit.Assert.*;
 		classes = Application.class
 )
 @TestPropertySource(locations = "classpath:application-test.properties")
+@WithUserDetails(value = "admin")
 public class DefaultCampaignIntegrationTest {
 
 	@Autowired
@@ -71,6 +74,7 @@ public class DefaultCampaignIntegrationTest {
 
 	@Test
 	@DirtiesContext
+	@WithAnonymousUser
 	public void getInvisibleCampaignByIdAsAnonymous() {
 		sessionService.setSessionUser(new CampaignManager());
 		try {

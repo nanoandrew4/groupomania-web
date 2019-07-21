@@ -15,7 +15,7 @@ public class CampaignManager extends User {
 	@OneToOne(mappedBy = "campaignManager", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private CampaignManagerProfile campaignManagerProfile;
 
-	@OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Campaign> campaigns;
 
 	public boolean equals(final Object o) {
@@ -24,9 +24,8 @@ public class CampaignManager extends User {
 		if (o == null || getClass() != o.getClass())
 			return false;
 		final CampaignManager otherManager = (CampaignManager) o;
-		return getId() != null || (otherManager.getId() == null && getId().equals(otherManager.getId())) ||
-			   getUsername().equals(otherManager.getUsername()) ||
-			   campaignManagerProfile.getEmail().equals(otherManager.getCampaignManagerProfile().getEmail());
+		return (getId() != null && otherManager.getId() != null && getId().equals(otherManager.getId())) ||
+			   (getUsername() != null && otherManager.getUsername() != null && getUsername().equals(otherManager.getUsername()));
 	}
 
 	public List<Campaign> getCampaigns() {

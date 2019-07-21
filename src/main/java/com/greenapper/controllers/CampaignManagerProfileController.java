@@ -25,7 +25,7 @@ public class CampaignManagerProfileController {
 	@Autowired
 	private CampaignManagerProfileService campaignManagerProfileService;
 
-	public final static String PROFILE_UPDATE_URI = "/campaign-manager/profile/update";
+	public final static String PROFILE_UPDATE_URI = "/campaign-manager/profile";
 
 	@GetMapping
 	@ApiOperation(value = "Retrieves the profile of the campaign manager currently in session")
@@ -37,7 +37,7 @@ public class CampaignManagerProfileController {
 		return campaignManagerProfileService.getProfileForCurrentUser();
 	}
 
-	@PutMapping("/update")
+	@PutMapping
 	@ApiOperation(value = "Update the user profile with the new data supplied in the body")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Profile updated successfully"),

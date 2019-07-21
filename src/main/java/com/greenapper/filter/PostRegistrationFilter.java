@@ -7,8 +7,10 @@ import com.greenapper.models.CampaignManagerProfile;
 import com.greenapper.models.User;
 import com.greenapper.services.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -20,8 +22,8 @@ import java.io.IOException;
  * if that data is not existent due to the user logging in for the first time, for example. While the necessary data
  * does not exist, all requests to the server will redirect to the appropriate update page.
  */
-//@Component
-//@Order(1)
+@Component
+@Order(1)
 public class PostRegistrationFilter implements Filter {
 
 	@Autowired

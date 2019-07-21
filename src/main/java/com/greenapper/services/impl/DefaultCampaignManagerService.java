@@ -16,6 +16,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 import javax.annotation.Resource;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -66,7 +67,8 @@ public class DefaultCampaignManagerService implements CampaignManagerService {
 
 	@Override
 	public List<CampaignDTO> getCampaigns() {
-		return getSessionCampaignManager().getCampaigns().stream().map(campaignDTOFactory::createCampaignDTO).collect(Collectors.toList());
+		return getSessionCampaignManager().getCampaigns().stream().sorted(Comparator.comparing(Campaign::getStartDate))
+				.map(campaignDTOFactory::createCampaignDTO).collect(Collectors.toList());
 	}
 
 	@Override
