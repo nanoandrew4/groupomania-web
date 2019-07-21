@@ -76,7 +76,11 @@ public class DefaultCampaignManagerService implements CampaignManagerService {
 		return campaignManagerRepository.findPasswordChangeRequiredById(sessionService.getSessionUser().getId());
 	}
 
-	private CampaignManager getSessionCampaignManager() {
+	public CampaignManager getSessionCampaignManager() {
 		return (CampaignManager) sessionService.getSessionUser();
+	}
+
+	public void setCampaignDTOFactory(CampaignDTOFactory campaignDTOFactory) {
+		this.campaignDTOFactory = campaignDTOFactory;
 	}
 }

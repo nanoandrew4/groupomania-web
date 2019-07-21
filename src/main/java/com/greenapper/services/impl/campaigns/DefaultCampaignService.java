@@ -138,4 +138,8 @@ public abstract class DefaultCampaignService implements CampaignService {
 	private CampaignManager getSessionCampaignManager() {
 		return (CampaignManager) sessionService.getSessionUser();
 	}
+
+	public void setCampaignDTOFactory(CampaignDTOFactory campaignDTOFactory) {
+		this.campaignDTOFactory = campaignDTOFactory;
+	}
 }
