@@ -54,15 +54,7 @@ public class DefaultFileSystemStorageService implements FileSystemStorageService
 			final String contentType = Objects.requireNonNull(image.getType()).replace("image/", "");
 			String relativeStoragePath = "";
 			try {
-				/*
-				 * Files are stored in a directory named after the hashed username, and the file name itself is hashed,
-				 * so that anonymous users cannot trivially retrieve any stored file.
-				 */
-				String hashedFileName = new String(Base64.getEncoder().encode(md.digest(image.getBytes())))
-						.replaceAll("/", "?").replaceAll("\\+", "?");
-				hashedFileName += "." + contentType;
-
-				relativeStoragePath = getSessionUsernameHash() + "/" + hashedFileName;
+				relativeStoragePath = generateFileNameForStorage(image, contentType);
 				final File outputFile = new File(rootStorageDir + relativeStoragePath);
 
 				Files.createDirectories(Paths.get(outputFile.getAbsolutePath()));
@@ -70,7 +62,7 @@ public class DefaultFileSystemStorageService implements FileSystemStorageService
 				ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(image.getBytes());
 				BufferedImage bufferedImage = ImageIO.read(byteArrayInputStream);
 				ImageIO.write(bufferedImage, contentType, outputFile);
-				LOG.info("Stored file with name: " + hashedFileName);
+				LOG.info("Stored file with name: " + relativeStoragePath);
 				return relativeStoragePath;
 			} catch (FileAlreadyExistsException e) {
 				LOG.info("File with name: \'" + relativeStoragePath + "\' already exists, returning \'" + relativeStoragePath + "\' to caller");
@@ -91,6 +83,18 @@ public class DefaultFileSystemStorageService implements FileSystemStorageService
 			LOG.error("Could not read image with name: \'" + name + "\'");
 		}
 		throw new UnknownIdentifierException("No image with name: \'" + name + "\' found");
+	}
+
+	public String generateFileNameForStorage(final ImageForm imageForm, final String contentType) {
+		/*
+		 * Files are stored in a directory named after the hashed username, and the file name itself is hashed,
+		 * so that anonymous users cannot trivially retrieve any stored file.
+		 */
+		String hashedFileName = new String(Base64.getEncoder().encode(md.digest(imageForm.getBytes())))
+				.replaceAll("/", "?").replaceAll("\\+", "?");
+		hashedFileName += "." + contentType;
+
+		return getSessionUsernameHash() + "/" + hashedFileName;
 	}
 
 	private String getSessionUsernameHash() {

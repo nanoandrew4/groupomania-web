@@ -40,11 +40,8 @@ public class DefaultCampaignManagerProfileService implements CampaignManagerProf
 	@Override
 	public CampaignManagerProfileDTO getProfileForCurrentUser() {
 		final Long sessionUserId = sessionService.getSessionUser().getId();
-		final CampaignManagerProfile profile = campaignManagerProfileRepository.findById(sessionUserId).orElse(null);
-
-		if (profile == null)
-			throw new NotFoundException("Campaign manager profile was not found, for manager with id: \'" + sessionUserId + "\'");
-		return new CampaignManagerProfileDTO(profile);
+		return campaignManagerProfileRepository.findById(sessionUserId).map(CampaignManagerProfileDTO::new)
+				.orElseThrow(() -> new NotFoundException("Campaign manager profile was not found, for manager with id: \'" + sessionUserId + "\'"));
 	}
 
 	@Override

@@ -31,7 +31,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class DefaultCampaignManagerUnitTest {
+public class DefaultCampaignManagerServiceUnitTest {
 
 	@InjectMocks
 	private DefaultCampaignManagerService campaignManagerService = new DefaultCampaignManagerService();
