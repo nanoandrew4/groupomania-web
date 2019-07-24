@@ -146,7 +146,7 @@
 
                 <configuration>
                     <imageName>${project.artifactId}</imageName>
-                    <dockerDirectory>${project.build.directory}/docker/${dockerdir}/groupomania/</dockerDirectory>
+                    <dockerDirectory>${project.basedir}/docker/${dockerdir}/groupomania/</dockerDirectory>
                     <buildArgs>
                         <JAR_FILE>groupomania-1.1.jar</JAR_FILE>
                     </buildArgs>

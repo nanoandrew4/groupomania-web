@@ -7,6 +7,8 @@ COPY ${JAR_FILE} app.jar
 RUN addgroup -S groupomania-admin && adduser -S groupomania-admin -G groupomania-admin
 
 USER groupomania-admin
-ENTRYPOINT ["java","-jar","/app.jar"]
 
-HEALTHCHECK --interval=1m --timeout=10s --retries=3 CMD curl --fail https://localhost:8443/ || exit 1
+ENV JAVA_OPTS="-Dspring.datasource.url=jdbc:postgresql://postgres:5432/groupomania?currentSchema=groupomania_schema"
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app.jar"]
+
+HEALTHCHECK --interval=1m --timeout=10s --retries=3 CMD curl --fail https://127.0.0.1:8443/ || exit 1

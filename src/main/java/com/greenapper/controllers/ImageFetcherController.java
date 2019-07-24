@@ -1,6 +1,7 @@
 package com.greenapper.controllers;
 
 import com.greenapper.dtos.ErrorDTO;
+import com.greenapper.dtos.ImageDTO;
 import com.greenapper.services.FileSystemStorageService;
 import com.greenapper.services.SessionService;
 import io.swagger.annotations.*;
@@ -30,7 +31,7 @@ public class ImageFetcherController {
 			@ApiResponse(code = 200, message = "Image retrieved successfully"),
 			@ApiResponse(code = 404, message = "The image could not be found", response = ErrorDTO.class)
 	})
-	public byte[] findImage(@RequestParam @ApiParam(value = "Name of the image to retrieve", required = true) final String fileName) {
-		return fileSystemStorageService.readImage(fileName);
+	public ImageDTO findImage(@RequestParam @ApiParam(value = "Name of the image to retrieve", required = true) final String fileName) {
+		return new ImageDTO(fileSystemStorageService.readImage(fileName));
 	}
 }

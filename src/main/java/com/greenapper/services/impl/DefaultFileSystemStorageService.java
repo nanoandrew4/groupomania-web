@@ -77,6 +77,7 @@ public class DefaultFileSystemStorageService implements FileSystemStorageService
 
 	@Override
 	public byte[] readImage(final String name) {
+		LOG.info("Attempting to read image with name: " + name);
 		try {
 			return Files.readAllBytes(Paths.get(rootStorageDir + name));
 		} catch (IOException e) {
