@@ -1,1 +1,0 @@
-create schema groupomania_schema;

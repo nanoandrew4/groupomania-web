@@ -1,6 +1,9 @@
 package com.greenapper.services.impl;
 
 import com.greenapper.config.SecurityConfig;
+import com.greenapper.dtos.campaign.CampaignDTO;
+import com.greenapper.exceptions.ValidationException;
+import com.greenapper.factories.campaign.CampaignDTOFactory;
 import com.greenapper.forms.PasswordUpdateForm;
 import com.greenapper.models.CampaignManager;
 import com.greenapper.models.campaigns.Campaign;
@@ -13,8 +16,10 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 import javax.annotation.Resource;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DefaultCampaignManagerService implements CampaignManagerService {
@@ -31,6 +36,9 @@ public class DefaultCampaignManagerService implements CampaignManagerService {
 	@Resource
 	private Validator passwordUpdateValidator;
 
+	@Autowired
+	private CampaignDTOFactory campaignDTOFactory;
+
 	@Override
 	public Optional<CampaignManager> getByUsername(final String username) {
 		return Optional.ofNullable(campaignManagerRepository.findByUsername(username));
@@ -39,16 +47,18 @@ public class DefaultCampaignManagerService implements CampaignManagerService {
 	@Override
 	public void updatePassword(final PasswordUpdateForm passwordUpdateForm, final Errors errors) {
 		passwordUpdateValidator.validate(passwordUpdateForm, errors);
-		if (!errors.hasErrors()) {
-			final CampaignManager sessionUser = getSessionCampaignManager();
-			sessionUser.setPassword(securityConfig.getPasswordEncoder().encode(passwordUpdateForm.getNewPassword()));
-			sessionUser.setPasswordChangeRequired(false);
-			campaignManagerRepository.save(sessionUser);
-		}
+
+		if (errors.hasErrors())
+			throw new ValidationException("Password update encountered validation errors", errors);
+
+		final CampaignManager sessionUser = getSessionCampaignManager();
+		sessionUser.setPassword(securityConfig.getPasswordEncoder().encode(passwordUpdateForm.getNewPassword()));
+		sessionUser.setPasswordChangeRequired(false);
+		campaignManagerRepository.save(sessionUser);
 	}
 
 	@Override
-	public void addCampaignToCampaignManager(final Campaign campaign) {
+	public void addOrUpdateCampaignForCampaignManager(final Campaign campaign) {
 		final CampaignManager campaignManager = getSessionCampaignManager();
 		campaignManager.getCampaigns().removeIf(campaign::equals);
 		campaignManager.getCampaigns().add(campaign);
@@ -56,8 +66,9 @@ public class DefaultCampaignManagerService implements CampaignManagerService {
 	}
 
 	@Override
-	public List<Campaign> getCampaigns() {
-		return getSessionCampaignManager().getCampaigns();
+	public List<CampaignDTO> getCampaigns() {
+		return getSessionCampaignManager().getCampaigns().stream().sorted(Comparator.comparing(Campaign::getStartDate))
+				.map(campaignDTOFactory::createCampaignDTO).collect(Collectors.toList());
 	}
 
 	@Override
@@ -65,7 +76,11 @@ public class DefaultCampaignManagerService implements CampaignManagerService {
 		return campaignManagerRepository.findPasswordChangeRequiredById(sessionService.getSessionUser().getId());
 	}
 
-	private CampaignManager getSessionCampaignManager() {
+	public CampaignManager getSessionCampaignManager() {
 		return (CampaignManager) sessionService.getSessionUser();
+	}
+
+	public void setCampaignDTOFactory(CampaignDTOFactory campaignDTOFactory) {
+		this.campaignDTOFactory = campaignDTOFactory;
 	}
 }

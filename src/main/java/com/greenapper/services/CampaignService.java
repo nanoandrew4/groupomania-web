@@ -1,13 +1,12 @@
 package com.greenapper.services;
 
+import com.greenapper.dtos.campaign.CampaignDTO;
 import com.greenapper.enums.CampaignType;
 import com.greenapper.forms.campaigns.CampaignForm;
-import com.greenapper.models.CampaignManager;
 import com.greenapper.models.campaigns.Campaign;
 import org.springframework.validation.Errors;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Service that contains all business logic pertaining to {@link Campaign} and its subclasses.
@@ -59,32 +58,26 @@ public interface CampaignService {
 	void setDefaultsForCampaignSubtype(final Campaign campaign);
 
 	/**
-	 * Retrieves a {@link Campaign} given its ID, or null if it does not exist.
+	 * Returns a {@link Campaign} given its ID, converted to a DTO, or an empty optional if it does not exist.
 	 *
 	 * @param id ID of the campaign to retrieve
-	 * @return The retrieved campaign wrapped in an optional
+	 * @return The retrieved campaign converted to a DTO and wrapped in an optional
 	 */
-	Optional<Campaign> getCampaignById(final Long id);
+	CampaignDTO getCampaignById(final Long id);
 
 	/**
-	 * Retrieves a {@link Campaign} by ID, if it is associated to the {@link CampaignManager} currently in session.
+	 * Returns a {@link Campaign} given its ID if it belongs to the session user, converted to a DTO,
+	 * or an empty optional if it does not exist.
 	 *
-	 * @param id ID of the campaign to retrieve
-	 * @return The retrieved campaign wrapped in an optional
+	 * @param id ID of the campaign to retrieve for the session user
+	 * @return The retrieved campaign, converted to a DTO and wrapped in an optional
 	 */
-	Optional<Campaign> getCampaignByIdAndSessionUser(final Long id);
-
-	/**
-	 * Retrieves all the {@link Campaign}s for the {@link CampaignManager} in session.
-	 *
-	 * @return A list of the campaigns associated to the manager in session
-	 */
-	List<Campaign> getAllCampaignsForSessionUser();
+	CampaignDTO getCampaignByIdForSessionUser(final Long id);
 
 	/**
 	 * Retrieves all stored campaigns.
 	 *
 	 * @return All stored campaigns
 	 */
-	List<Campaign> getAllCampaigns();
+	List<CampaignDTO> getAllCampaigns();
 }

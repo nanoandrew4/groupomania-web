@@ -1,7 +1,11 @@
 package com.greenapper.services.impl.campaigns;
 
+import com.greenapper.dtos.campaign.CampaignDTO;
 import com.greenapper.enums.CampaignState;
-import com.greenapper.factories.CampaignFactory;
+import com.greenapper.exceptions.UnknownIdentifierException;
+import com.greenapper.exceptions.ValidationException;
+import com.greenapper.factories.campaign.CampaignDTOFactory;
+import com.greenapper.factories.campaign.CampaignFactory;
 import com.greenapper.forms.campaigns.CampaignForm;
 import com.greenapper.models.CampaignManager;
 import com.greenapper.models.campaigns.Campaign;
@@ -16,8 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.Errors;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public abstract class DefaultCampaignService implements CampaignService {
 
@@ -36,74 +43,79 @@ public abstract class DefaultCampaignService implements CampaignService {
 	@Autowired
 	private CampaignFactory campaignFactory;
 
+	@Autowired
+	private CampaignDTOFactory campaignDTOFactory;
+
 	private Logger LOG = LoggerFactory.getLogger(this.getClass());
-
-	public DefaultCampaignService() {
-
-	}
 
 	@Override
 	public void createCampaign(final CampaignForm campaignForm, final Errors errors) {
 		validateCampaign(campaignForm, errors);
-		if (!errors.hasErrors()) {
-			campaignFactory.createCampaignModel(campaignForm).ifPresent(campaign -> {
-				campaign.setOwner(getSessionCampaignManager());
-				campaign.setState(CampaignState.INACTIVE);
-				setDefaultsForCampaignSubtype(campaign);
-				saveCampaign(campaign, campaignForm);
-				LOG.info("Created campaign with ID: " + campaign.getId() + " of type: " + campaign.getType() + " for user: " + campaign.getOwner().getId());
-			});
-		}
+
+		if (errors.hasErrors())
+			throw new ValidationException("Validation errors where encountered when updating a campaign", errors);
+
+		campaignFactory.createCampaignModel(campaignForm).ifPresent(campaign -> {
+			campaign.setOwner(getSessionCampaignManager());
+			campaign.setState(CampaignState.INACTIVE);
+			setDefaultsForCampaignSubtype(campaign);
+			saveCampaign(campaign, campaignForm);
+			LOG.info("Created campaign with ID: " + campaign.getId() + " of type: " + campaign.getType() + " for user: " + campaign.getOwner().getId());
+		});
 	}
 
 	@Override
 	public void updateCampaign(final CampaignForm campaignForm, final Errors errors) {
 		validateCampaign(campaignForm, errors);
-		if (!errors.hasErrors()) {
-			campaignFactory.createCampaignModel(campaignForm).ifPresent(campaign -> {
-				campaign.setOwner(getSessionCampaignManager());
-				saveCampaign(campaign, campaignForm);
-				LOG.info("Updated campaign with ID: " + campaign.getId() + " of type: " + campaign.getType() + " for user: " + campaign.getOwner().getId());
-			});
-		}
-	}
 
-	@Override
-	public void updateCampaignState(final Long id, final String state) {
-		campaignRepository.findById(id).ifPresent(campaign -> {
-			campaign.setState(CampaignState.valueOf(state.toUpperCase()));
-			if (campaign.getState() == CampaignState.ARCHIVED) {
-				if (LocalDate.now().isBefore(campaign.getStartDate()))
-					campaign.setStartDate(LocalDate.now());
-				campaign.setEndDate(LocalDate.now());
-			}
-			campaignManagerService.addCampaignToCampaignManager(campaign);
-			LOG.info("Created campaign state for campaign with ID: " + campaign.getId() + " of type: " + campaign.getType()
-					 + " for user: " + campaign.getOwner().getId() + " and with new state: " + campaign.getState());
+		if (campaignForm.getId() == null)
+			throw new UnknownIdentifierException("No id was found, which is necessary when updating a campaign");
+
+		if (errors.hasErrors())
+			throw new ValidationException("Validation errors where encountered when updating a campaign", errors);
+
+		campaignFactory.createCampaignModel(campaignForm).ifPresent(campaign -> {
+			campaign.setOwner(getSessionCampaignManager());
+			saveCampaign(campaign, campaignForm);
+			LOG.info("Updated campaign with ID: " + campaign.getId() + " of type: " + campaign.getType() + " for user: " + campaign.getOwner().getId());
 		});
 	}
 
 	@Override
-	public Optional<Campaign> getCampaignById(final Long id) {
-		return campaignRepository.findById(id);
+	public void updateCampaignState(final Long id, final String state) {
+		final Predicate<Campaign> filterByOwner = campaign -> campaign.getOwner().getId().equals(sessionService.getSessionUser().getId());
+		final Campaign campaign = campaignRepository.findById(id).filter(filterByOwner).orElse(null);
+		if (campaign == null)
+			throw new UnknownIdentifierException("Campaign with id: \'" + id + "\' was not found for the session user");
+
+		campaign.setState(CampaignState.valueOf(state.toUpperCase()));
+		if (campaign.getState() == CampaignState.ARCHIVED) {
+			if (LocalDate.now().isBefore(campaign.getStartDate()))
+				campaign.setStartDate(LocalDate.now());
+			campaign.setEndDate(LocalDate.now());
+		}
+		campaignManagerService.addOrUpdateCampaignForCampaignManager(campaign);
+		LOG.info("Created campaign state for campaign with ID: " + campaign.getId() + " of type: " + campaign.getType()
+				 + " for user: " + campaign.getOwner().getId() + " and with new state: " + campaign.getState());
 	}
 
 	@Override
-	public Optional<Campaign> getCampaignByIdAndSessionUser(final Long id) {
-		final Optional<Campaign> campaign = campaignRepository.findById(id);
-		if (campaign.isPresent() && campaign.get().getOwner().getId().equals(sessionService.getSessionUser().getId()))
-			return campaign;
-		return Optional.empty();
+	public CampaignDTO getCampaignById(final Long id) {
+		return campaignRepository.findById(id).map(campaignDTOFactory::createCampaignDTO)
+				.orElseThrow(() -> new UnknownIdentifierException("Campaign with id: \'" + id + "\' could not be found"));
 	}
 
 	@Override
-	public List<Campaign> getAllCampaigns() {
-		return campaignRepository.findAll();
+	public CampaignDTO getCampaignByIdForSessionUser(final Long id) {
+		final Predicate<Campaign> filterByOwner = campaign -> campaign.getOwner().equals(sessionService.getSessionUser());
+		return campaignRepository.findById(id).filter(filterByOwner).map(campaignDTOFactory::createCampaignDTO)
+				.orElseThrow(() -> new UnknownIdentifierException("Campaign with id: \'" + id + "\' does not belong to the session user"));
 	}
 
 	@Override
-	public List<Campaign> getAllCampaignsForSessionUser() {
-		return getSessionCampaignManager().getCampaigns();
+	public List<CampaignDTO> getAllCampaigns() {
+		return campaignRepository.findAll().stream().sorted(Comparator.comparing(Campaign::getStartDate))
+				.map(campaignDTOFactory::createCampaignDTO).collect(Collectors.toList());
 	}
 
 	/**
@@ -120,10 +132,14 @@ public abstract class DefaultCampaignService implements CampaignService {
 		Optional.ofNullable(imagePath).ifPresent(campaign::setCampaignImageFilePath);
 
 		campaignRepository.save(campaign);
-		campaignManagerService.addCampaignToCampaignManager(campaign);
+		campaignManagerService.addOrUpdateCampaignForCampaignManager(campaign);
 	}
 
 	private CampaignManager getSessionCampaignManager() {
 		return (CampaignManager) sessionService.getSessionUser();
+	}
+
+	public void setCampaignDTOFactory(CampaignDTOFactory campaignDTOFactory) {
+		this.campaignDTOFactory = campaignDTOFactory;
 	}
 }

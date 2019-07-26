@@ -1,65 +1,51 @@
 package com.greenapper.controllers;
 
+import com.greenapper.dtos.CampaignManagerProfileDTO;
+import com.greenapper.dtos.ErrorDTO;
+import com.greenapper.dtos.ValidationErrorDTO;
+import com.greenapper.forms.CampaignManagerProfileForm;
 import com.greenapper.models.CampaignManager;
-import com.greenapper.models.CampaignManagerProfile;
 import com.greenapper.services.CampaignManagerProfileService;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-
-import java.util.Optional;
+import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * Controller for handling all operations regarding a {@link CampaignManager}s profile.
  */
-@Controller
+@RestController
+@RequestMapping("/campaign-manager/profile")
+@Secured("ROLE_CAMPAIGN_MANAGER")
+@Api(value = "/campaign-manager/profile", description = "Contains all endpoints regarding profiles for campaign managers")
 public class CampaignManagerProfileController {
 
 	@Autowired
 	private CampaignManagerProfileService campaignManagerProfileService;
 
-	private final static String ROOT_URI = "/campaign-manager/profile";
+	public final static String PROFILE_UPDATE_URI = "/campaign-manager/profile";
 
-	public final static String PROFILE_UPDATE_URI = ROOT_URI + "/setup";
-
-	public final static String PROFILE_UPDATE_FORM = "campaign_manager/profileSetup";
-
-	public final static String PROFILE_UPDATE_SUCCESS = "redirect:" + CampaignManagerController.CAMPAIGNS_OVERVIEW_URI;
-
-	/**
-	 * Retrieves the {@link CampaignManagerProfile} associated to the {@link CampaignManager} that is in session,
-	 * if the manager has a profile associated, otherwise a new profile model is returned.
-	 *
-	 * @param model Model to which the existing or empty campaign profile will be written
-	 * @return Profile update page
-	 */
-	@GetMapping(PROFILE_UPDATE_URI)
-	public String getCampaignManagerProfileSetup(final Model model) {
-		final Optional<CampaignManagerProfile> profile = campaignManagerProfileService.getProfileForCurrentUser();
-		model.addAttribute(profile.orElseGet(CampaignManagerProfile::new));
-		return PROFILE_UPDATE_FORM;
+	@GetMapping
+	@ApiOperation(value = "Retrieves the profile of the campaign manager currently in session")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Campaign manager profile returned successfully"),
+			@ApiResponse(code = 404, message = "Profile for campaign manager in session could not be found", response = ErrorDTO.class)
+	})
+	public CampaignManagerProfileDTO getCampaignManagerProfileSetup() {
+		return campaignManagerProfileService.getProfileForCurrentUser();
 	}
 
-	/**
-	 * Initiates the profile update process, by passing the supplied model down to the service layer. Will return a redirect
-	 * to the previously visited page if the update was completed successfully, or the update page alongside the validation
-	 * errors encountered otherwise.
-	 *
-	 * @param campaignManagerProfile Updated profile model to associate with the {@link CampaignManager} in session
-	 * @param errors                 Errors associated to the supplied profile, which will be populated if any validation errors are encountered in the service layer
-	 * @return Redirect to the previously visited page if the update completed successfully, or the update page alongside the appropriate validation errors otherwise
-	 */
-	@PutMapping(PROFILE_UPDATE_URI)
-	public String updateProfile(final CampaignManagerProfile campaignManagerProfile, final Errors errors) {
-		campaignManagerProfileService.updateProfile(campaignManagerProfile, errors);
-
-		if (!errors.hasErrors()) {
-			return PROFILE_UPDATE_SUCCESS;
-		} else {
-			return PROFILE_UPDATE_FORM;
-		}
+	@PutMapping
+	@ApiOperation(value = "Update the user profile with the new data supplied in the body")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Profile updated successfully"),
+			@ApiResponse(code = 400, message = "Validation errors were encountered during the profile update process", response = ValidationErrorDTO.class)
+	})
+	public void updateProfile(
+			@RequestBody @ApiParam(value = "Profile form containing the data to override existing values", required = true) final CampaignManagerProfileForm profileForm,
+			@ApiIgnore final Errors errors) {
+		campaignManagerProfileService.updateProfile(profileForm, errors);
 	}
 }

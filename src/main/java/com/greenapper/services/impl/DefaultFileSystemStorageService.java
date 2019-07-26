@@ -1,5 +1,7 @@
 package com.greenapper.services.impl;
 
+import com.greenapper.exceptions.UnknownIdentifierException;
+import com.greenapper.forms.ImageForm;
 import com.greenapper.services.FileSystemStorageService;
 import com.greenapper.services.SessionService;
 import org.slf4j.Logger;
@@ -7,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -21,7 +22,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 public class DefaultFileSystemStorageService implements FileSystemStorageService {
@@ -49,19 +49,12 @@ public class DefaultFileSystemStorageService implements FileSystemStorageService
 	}
 
 	@Override
-	public String saveImage(final MultipartFile image) {
+	public String saveImage(final ImageForm image) {
 		if (image != null && image.getSize() > 0) {
-			final String contentType = Objects.requireNonNull(image.getContentType()).replace("image/", "");
+			final String contentType = Objects.requireNonNull(image.getType()).replace("image/", "");
 			String relativeStoragePath = "";
 			try {
-				/*
-				 * Files are stored in a directory named after the hashed username, and the file name itself is hashed,
-				 * so that anonymous users cannot trivially retrieve any stored file.
-				 */
-				String hashedFileName = new String(Base64.getEncoder().encode(md.digest(image.getBytes()))).replaceAll("/", "?");
-				hashedFileName += "." + contentType;
-
-				relativeStoragePath = getSessionUsernameHash() + "/" + hashedFileName;
+				relativeStoragePath = generateFileNameForStorage(image, contentType);
 				final File outputFile = new File(rootStorageDir + relativeStoragePath);
 
 				Files.createDirectories(Paths.get(outputFile.getAbsolutePath()));
@@ -69,7 +62,7 @@ public class DefaultFileSystemStorageService implements FileSystemStorageService
 				ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(image.getBytes());
 				BufferedImage bufferedImage = ImageIO.read(byteArrayInputStream);
 				ImageIO.write(bufferedImage, contentType, outputFile);
-				LOG.info("Stored file with name: " + hashedFileName);
+				LOG.info("Stored file with name: " + relativeStoragePath);
 				return relativeStoragePath;
 			} catch (FileAlreadyExistsException e) {
 				LOG.info("File with name: \'" + relativeStoragePath + "\' already exists, returning \'" + relativeStoragePath + "\' to caller");
@@ -83,16 +76,30 @@ public class DefaultFileSystemStorageService implements FileSystemStorageService
 	}
 
 	@Override
-	public Optional<byte[]> readImage(final String name) {
+	public byte[] readImage(final String name) {
+		LOG.info("Attempting to read image with name: " + name);
 		try {
-			return Optional.of(Files.readAllBytes(Paths.get(rootStorageDir + name)));
+			return Files.readAllBytes(Paths.get(rootStorageDir + name));
 		} catch (IOException e) {
 			LOG.error("Could not read image with name: \'" + name + "\'");
 		}
-		return Optional.empty();
+		throw new UnknownIdentifierException("No image with name: \'" + name + "\' found");
+	}
+
+	public String generateFileNameForStorage(final ImageForm imageForm, final String contentType) {
+		/*
+		 * Files are stored in a directory named after the hashed username, and the file name itself is hashed,
+		 * so that anonymous users cannot trivially retrieve any stored file.
+		 */
+		String hashedFileName = new String(Base64.getEncoder().encode(md.digest(imageForm.getBytes())))
+				.replaceAll("/", "?").replaceAll("\\+", "?");
+		hashedFileName += "." + contentType;
+
+		return getSessionUsernameHash() + "/" + hashedFileName;
 	}
 
 	private String getSessionUsernameHash() {
-		return new String(Base64.getEncoder().encode(md.digest(sessionService.getSessionUser().getUsername().getBytes()))).replaceAll("/", "?");
+		return new String(Base64.getEncoder().encode(md.digest(sessionService.getSessionUser().getUsername().getBytes())))
+				.replaceAll("/", "?").replaceAll("\\+", "?");
 	}
 }

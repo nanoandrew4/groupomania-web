@@ -5,6 +5,7 @@ import com.greenapper.forms.PasswordUpdateForm;
 import com.greenapper.models.User;
 import com.greenapper.services.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -15,7 +16,7 @@ import org.springframework.validation.Validator;
  * is not compromised and that the specified password rules are followed.
  */
 @Component
-public class PasswordUpdateValidator implements Validator {
+public class PasswordUpdateValidator extends GlobalValidator implements Validator {
 
 	@Autowired
 	private SecurityConfig securityConfig;
@@ -23,13 +24,16 @@ public class PasswordUpdateValidator implements Validator {
 	@Autowired
 	private SessionService sessionService;
 
+	@Autowired
+	private MessageSource messageSource;
+
 	@Override
 	public boolean supports(Class<?> clazz) {
 		return clazz.equals(PasswordUpdateForm.class);
 	}
 
 	@Override
-	public void validate(Object target, Errors errors) {
+	public void validate(final Object target, final Errors errors) {
 		if (target == null) {
 			errors.reject("err.password");
 			return;
@@ -39,11 +43,13 @@ public class PasswordUpdateValidator implements Validator {
 		final User sessionUser = sessionService.getSessionUser();
 		final PasswordEncoder pwdEncoder = securityConfig.getPasswordEncoder();
 
-		if (pwdEncoder.matches(passwordUpdateForm.getNewPassword(), sessionUser.getPassword()))
-			errors.reject("err.password.samepassword");
+		if (!passwordUpdateForm.getNewPassword().equals(passwordUpdateForm.getConfirmNewPassword()))
+			errors.reject("err.password.newpassword.mismatch");
 		else if (passwordUpdateForm.getNewPassword().length() < 6)
 			errors.reject("err.password.length");
-		else if (!pwdEncoder.matches(passwordUpdateForm.getOldPassword(), sessionUser.getPassword()))
+		if (!pwdEncoder.matches(passwordUpdateForm.getOldPassword(), sessionUser.getPassword()))
 			errors.reject("err.password.mismatch");
+		if (pwdEncoder.matches(passwordUpdateForm.getNewPassword(), sessionUser.getPassword()))
+			errors.reject("err.password.samepassword");
 	}
 }

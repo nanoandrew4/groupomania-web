@@ -2,40 +2,54 @@ package com.greenapper.forms.campaigns;
 
 import com.greenapper.enums.CampaignState;
 import com.greenapper.enums.CampaignType;
+import com.greenapper.forms.ImageForm;
 import com.greenapper.models.campaigns.Campaign;
-import org.springframework.web.multipart.MultipartFile;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
-/**
- * Generic campaign form to be sent from the frontend to the backend. Numeric and date fields are stored as strings,
- * so that validations can be performed in the backend.
- */
+@ApiModel(description = "Represents a campaign object, this form is extended from so that the campaign subclasses can implemented their own forms",
+		  subTypes = {OfferCampaignForm.class, CouponCampaignForm.class})
 public class CampaignForm {
+	@ApiModelProperty(value = "Campaign identifier", notes = "Is unique across all campaigns", required = true)
 	private Long id;
 
+	@ApiModelProperty(value = "Campaign title", required = true)
 	private String title;
 
+	@ApiModelProperty(value = "Campaign description", required = true)
 	private String description;
 
-	private MultipartFile campaignImage;
+	@ApiModelProperty(value = "Image to save and associate with this campaign")
+	private ImageForm campaignImage;
 
+	@ApiModelProperty(value = "Path to use when calling the /images endpoint to retrieve the image associated to this campaign")
 	private String campaignImageFilePath;
 
+	@ApiModelProperty(value = "The type of campaign", required = true)
 	private CampaignType type;
 
+	@ApiModelProperty(value = "The campaign state", required = true)
 	private CampaignState state;
 
+	@ApiModelProperty(value = "The date that the campaign begins", required = true)
 	private String startDate;
 
+	@ApiModelProperty(value = "The date that the campaign ends", required = true)
 	private String endDate;
 
+	@ApiModelProperty(value = "The quantity of discounts available", required = true)
 	private String quantity = String.valueOf(Double.POSITIVE_INFINITY);
 
+	@ApiModelProperty(value = "Whether the campaign should be shown up to 4 days after it ends or not", required = true)
 	private boolean showAfterExpiration;
 
+	@ApiModelProperty(value = "Original price for the item or service the campaign is providing a discount or offer for", required = true)
 	private String originalPrice;
 
+	@ApiModelProperty(value = "Percent discount over the original price")
 	private String percentDiscount;
 
+	@ApiModelProperty(value = "Discounted price for the item or service the campaign is providing the discount for")
 	private String discountedPrice;
 
 	protected CampaignForm() {
@@ -81,11 +95,11 @@ public class CampaignForm {
 		this.description = description;
 	}
 
-	public MultipartFile getCampaignImage() {
+	public ImageForm getCampaignImage() {
 		return campaignImage;
 	}
 
-	public void setCampaignImage(MultipartFile campaignImage) {
+	public void setCampaignImage(ImageForm campaignImage) {
 		this.campaignImage = campaignImage;
 	}
 

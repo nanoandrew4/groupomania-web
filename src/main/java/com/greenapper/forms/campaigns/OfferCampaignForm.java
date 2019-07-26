@@ -2,11 +2,9 @@ package com.greenapper.forms.campaigns;
 
 import com.greenapper.enums.CampaignType;
 import com.greenapper.models.campaigns.OfferCampaign;
+import io.swagger.annotations.ApiModel;
 
-/**
- * Form for {@link OfferCampaign} campaigns. Contains all necessary fields to create a {@link OfferCampaign}, with numeric
- * fields and dates being stored as strings so they can be validated prior to being converted to campaign models.
- */
+@ApiModel(description = "Form that represents a coupon campaign", parent = CampaignForm.class)
 public class OfferCampaignForm extends CampaignForm {
 	public OfferCampaignForm() {
 		this.setType(CampaignType.OFFER);

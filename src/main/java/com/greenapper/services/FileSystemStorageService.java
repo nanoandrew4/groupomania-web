@@ -1,8 +1,7 @@
 package com.greenapper.services;
 
+import com.greenapper.forms.ImageForm;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.Optional;
 
 /**
  * Service that handles reading and writing files to the filesystem.
@@ -14,7 +13,7 @@ public interface FileSystemStorageService {
 	 * @param image Multipart file containing the image to store
 	 * @return The path the file was stored to, or null if it was not stored
 	 */
-	String saveImage(final MultipartFile image);
+	String saveImage(final ImageForm image);
 
 	/**
 	 * Attempts to retrieve a previously stored image given its path.
@@ -22,5 +21,5 @@ public interface FileSystemStorageService {
 	 * @param path Path to the desired image
 	 * @return An array of bytes representing the image, wrapped in an optional
 	 */
-	Optional<byte[]> readImage(final String path);
+	byte[] readImage(final String path);
 }

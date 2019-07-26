@@ -1,7 +1,7 @@
 package com.greenapper.services.impl.campaigns;
 
+import com.greenapper.dtos.CampaignManagerProfileDTO;
 import com.greenapper.forms.campaigns.CampaignForm;
-import com.greenapper.models.CampaignManagerProfile;
 import com.greenapper.models.campaigns.Campaign;
 import com.greenapper.models.campaigns.CouponCampaign;
 import com.greenapper.services.CampaignManagerProfileService;
@@ -28,7 +28,7 @@ public class CouponCampaignService extends DefaultCampaignService {
 	@Override
 	public void setDefaultsForCampaignSubtype(final Campaign campaignSubtype) {
 		final CouponCampaign couponCampaign = (CouponCampaign) campaignSubtype;
-		final CampaignManagerProfile sessionProfile = campaignManagerProfileService.getProfileForCurrentUser().orElseThrow(IllegalArgumentException::new);
+		final CampaignManagerProfileDTO sessionProfile = campaignManagerProfileService.getProfileForCurrentUser();
 
 		if (couponCampaign.getCampaignManagerName() == null || couponCampaign.getCampaignManagerName().trim().isEmpty())
 			couponCampaign.setCampaignManagerName(sessionProfile.getName());

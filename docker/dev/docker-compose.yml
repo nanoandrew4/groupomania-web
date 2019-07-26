@@ -1,0 +1,23 @@
+version: '2.2'
+
+services:
+  postgres:
+    build: postgres/
+    environment:
+      - POSTGRES_USER=greenapperdba
+      - POSTGRES_PASSWORD=supersecretpassword
+      - POSTGRES_DB=groupomania
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - "127.0.0.1:5432:5432"
+    restart: always
+    mem_limit: 2G
+    cpu_shares: 500 # Default val is 1024, lower values increase CPU priority
+    pids_limit: 64 # Limits num of processes running in container, prevents fork bombs for example
+    read_only: true # Makes container read only
+    tmpfs:
+      # For read-only filesystem, need to create a volume/tmpfs for PostgreSQL to run its much
+      # needed configuration. The read-only flag does not make volumes and tmpfs read-only.
+      - /tmp
+      - /run
+      - /run/postgresql

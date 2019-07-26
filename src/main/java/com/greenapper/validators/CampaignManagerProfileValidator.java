@@ -1,5 +1,6 @@
 package com.greenapper.validators;
 
+import com.greenapper.forms.CampaignManagerProfileForm;
 import com.greenapper.models.CampaignManagerProfile;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -22,7 +23,7 @@ public class CampaignManagerProfileValidator implements Validator {
 
 	@Override
 	public boolean supports(Class<?> clazz) {
-		return CampaignManagerProfile.class.equals(clazz);
+		return CampaignManagerProfileForm.class.equals(clazz);
 	}
 
 	@Override
@@ -32,14 +33,14 @@ public class CampaignManagerProfileValidator implements Validator {
 			return;
 		}
 
-		final CampaignManagerProfile updatedProfile = (CampaignManagerProfile) target;
+		final CampaignManagerProfileForm updatedProfile = (CampaignManagerProfileForm) target;
 
 		if (updatedProfile.getName() == null || updatedProfile.getName().trim().isEmpty())
 			errors.reject("err.profile.name");
 		if (updatedProfile.getEmail() == null || updatedProfile.getEmail().trim().isEmpty() || !VALID_EMAIL_ADDRESS_REGEX.matcher(updatedProfile.getEmail()).find())
 			errors.reject("err.profile.email");
-		if (updatedProfile.getProfileImage() != null && updatedProfile.getProfileImage().getSize() > 0 && (updatedProfile.getProfileImage().getContentType() == null ||
-																										   !updatedProfile.getProfileImage().getContentType().contains("image")))
+		if (updatedProfile.getProfileImage() != null && updatedProfile.getProfileImage().getSize() > 0 &&
+			(updatedProfile.getProfileImage().getType() == null || !updatedProfile.getProfileImage().getType().contains("image")))
 			errors.reject("err.profile.imageFormat");
 	}
 }

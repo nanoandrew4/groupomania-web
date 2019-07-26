@@ -4,14 +4,13 @@ import com.greenapper.models.User;
 import com.greenapper.services.CampaignManagerService;
 import com.greenapper.services.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.annotation.RequestScope;
 
 @Service
-@Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
+@RequestScope
 public class DefaultSessionService implements SessionService {
 
 	private User sessionUser;

@@ -6,7 +6,7 @@
 
     <groupId>com.greenapper</groupId>
     <artifactId>groupomania</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -15,7 +15,8 @@
     </parent>
 
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>8</java.version>
+        <dockerdir>prod</dockerdir>
         <docker.image.prefix>greenapper</docker.image.prefix>
     </properties>
 
@@ -31,22 +32,14 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>2.9.2</version>
         </dependency>
         <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.61</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-thymeleaf</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.thymeleaf.extras</groupId>
-            <artifactId>thymeleaf-extras-springsecurity4</artifactId>
-            <version>3.0.4.RELEASE</version>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>2.9.2</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -64,17 +57,70 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>2.3.0</version>
-        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa -->
         <dependency>
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
             <version>3.23.1-GA</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security.oauth.boot</groupId>
+            <artifactId>spring-security-oauth2-autoconfigure</artifactId>
+            <version>2.0.0.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.61</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-core</artifactId>
+            <version>2.2.11</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.2.11</version>
+        </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>DevEnvProfile</id>
+            <activation>
+                <property>
+                    <name>environment</name>
+                    <value>development</value>
+                </property>
+            </activation>
+            <properties>
+                <dockerdir>dev</dockerdir>
+            </properties>
+        </profile>
+        <profile>
+            <id>ProdEnvProfile</id>
+            <activation>
+                <property>
+                    <name>environment</name>
+                    <value>production</value>
+                </property>
+            </activation>
+            <properties>
+                <dockerdir>prod</dockerdir>
+            </properties>
+        </profile>
+    </profiles>
 
     <build>
         <plugins>
@@ -97,11 +143,12 @@
                 <groupId>com.spotify</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
                 <version>1.2.0</version>
+
                 <configuration>
                     <imageName>${project.artifactId}</imageName>
-                    <dockerDirectory>docker/groupomania/</dockerDirectory>
+                    <dockerDirectory>${project.basedir}/docker/${dockerdir}/groupomania/</dockerDirectory>
                     <buildArgs>
-                        <JAR_FILE>groupomania-1.0.jar</JAR_FILE>
+                        <JAR_FILE>groupomania-1.1.jar</JAR_FILE>
                     </buildArgs>
                     <resources>
                         <resource>
