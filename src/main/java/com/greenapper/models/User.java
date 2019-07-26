@@ -5,7 +5,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.Set;
 
 /**
- *
+ * Model for generic user types, contains fields that should be common to all user types.
  */
 @MappedSuperclass
 public class User {

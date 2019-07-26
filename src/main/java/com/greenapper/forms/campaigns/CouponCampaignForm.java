@@ -2,22 +2,27 @@ package com.greenapper.forms.campaigns;
 
 import com.greenapper.enums.CampaignType;
 import com.greenapper.models.campaigns.CouponCampaign;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
-/**
- * Form for {@link CouponCampaign} campaigns. Contains all fields necessary to create a {@link CouponCampaign},
- * with numeric and date fields being stored as strings for validation prior to being converted.
- */
+@ApiModel(description = "Form that represents a coupon campaign", parent = CampaignForm.class)
 public class CouponCampaignForm extends CampaignForm {
+	@ApiModelProperty(value = "Description for the coupon provided as part of the campaign")
 	private String couponDescription;
 
+	@ApiModelProperty(value = "Name of the contact for the campaign")
 	private String campaignManagerName;
 
+	@ApiModelProperty(value = "Email of the contact for the campaign")
 	private String campaignManagerEmail;
 
+	@ApiModelProperty(value = "Address of the contact for the campaign")
 	private String campaignManagerAddress;
 
+	@ApiModelProperty(value = "Date the coupon comes into effect", required = true)
 	private String couponStartDate;
 
+	@ApiModelProperty(value = "Date the coupon expires", required = true)
 	private String couponEndDate;
 
 	public CouponCampaignForm() {

@@ -3,32 +3,49 @@ package com.greenapper.dtos.campaign;
 import com.greenapper.enums.CampaignState;
 import com.greenapper.enums.CampaignType;
 import com.greenapper.models.campaigns.Campaign;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
+@ApiModel(description = "Represents a campaign object, this DTO is extended from so that the campaign subclasses can implemented their own DTO",
+		  subTypes = {OfferCampaignDTO.class, CouponCampaignDTO.class})
 public class CampaignDTO {
+	@ApiModelProperty(value = "Campaign identifier", notes = "Is unique across all campaigns", required = true)
 	private Long id;
 
+	@ApiModelProperty(value = "Campaign title", required = true)
 	private String title;
 
+	@ApiModelProperty(value = "Campaign description", required = true)
 	private String description;
 
+	@ApiModelProperty(value = "Path to use when calling the /images endpoint to retrieve the image associated to this campaign")
 	private String campaignImageFilePath;
 
+	@ApiModelProperty(value = "The type of campaign", required = true)
 	private CampaignType type;
 
+	@ApiModelProperty(value = "The campaign state", required = true)
 	private CampaignState state;
 
+	@ApiModelProperty(value = "The date that the campaign begins", required = true)
 	private String startDate;
 
+	@ApiModelProperty(value = "The date that the campaign ends", required = true)
 	private String endDate;
 
+	@ApiModelProperty(value = "The quantity of discounts available", required = true)
 	private String quantity = String.valueOf(Double.POSITIVE_INFINITY);
 
+	@ApiModelProperty(value = "Whether the campaign should be shown up to 4 days after it ends or not", required = true)
 	private boolean showAfterExpiration;
 
+	@ApiModelProperty(value = "Original price for the item or service the campaign is providing a discount or offer for", required = true)
 	private String originalPrice;
 
+	@ApiModelProperty(value = "Percent discount over the original price")
 	private String percentDiscount;
 
+	@ApiModelProperty(value = "Discounted price for the item or service the campaign is providing the discount for")
 	private String discountedPrice;
 
 	protected CampaignDTO() {

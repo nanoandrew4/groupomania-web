@@ -20,6 +20,10 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * Exception handler that converts internally thrown exceptions to a {@link ErrorDTO}, or one of its subclasses,
+ * so they can be returned to the caller.
+ */
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 

@@ -1,12 +1,21 @@
 package com.greenapper.forms;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+@ApiModel(description = "Form containing image data for upload and storage")
 public class ImageForm {
+
+	@ApiModelProperty(value = "File name of the image", required = true)
 	private String name;
 
+	@ApiModelProperty(value = "Type of the image", required = true)
 	private String type;
 
+	@ApiModelProperty(value = "Image size in bytes", required = true)
 	private Long size;
 
+	@ApiModelProperty(value = "Byte array representing the image", required = true)
 	private byte[] bytes;
 
 	public String getName() {

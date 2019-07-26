@@ -3,20 +3,28 @@ package com.greenapper.forms;
 import com.greenapper.models.CampaignManager;
 import com.greenapper.models.CampaignManagerProfile;
 import com.greenapper.models.User;
+import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Optional;
 
 public class CampaignManagerProfileForm {
+
+	@ApiModelProperty(value = "ID of this profile", required = true)
 	private Long id;
 
+	@ApiModelProperty(value = "Campaign manager this profile is associated with", required = true)
 	private User campaignManager;
 
+	@ApiModelProperty(value = "Name of the campaign manager this profile belongs to", required = true)
 	private String name;
 
+	@ApiModelProperty(value = "Email of the campaign manager this profile belongs to", required = true)
 	private String email;
 
+	@ApiModelProperty(value = "Physical address of the campaign manager this profile belongs to")
 	private String address;
 
+	@ApiModelProperty(value = "Image to associate as the users profile image")
 	private ImageForm profileImage;
 
 	private CampaignManagerProfileForm() {
