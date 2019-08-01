@@ -1,6 +1,6 @@
 package com.greenapper.factories.campaign;
 
-import com.greenapper.dtos.campaign.CampaignDTO;
+import com.greenapper.dtos.campaigns.CampaignDTO;
 import com.greenapper.models.campaigns.Campaign;
 
 /**

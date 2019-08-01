@@ -2,7 +2,7 @@ package com.greenapper.controllers;
 
 import com.greenapper.dtos.OAuthExceptionDTO;
 import com.greenapper.dtos.ValidationErrorDTO;
-import com.greenapper.dtos.campaign.CampaignDTO;
+import com.greenapper.dtos.campaigns.CampaignDTO;
 import com.greenapper.forms.PasswordUpdateForm;
 import com.greenapper.models.CampaignManager;
 import com.greenapper.services.CampaignManagerService;

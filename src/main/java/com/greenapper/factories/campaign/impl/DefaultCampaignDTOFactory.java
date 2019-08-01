@@ -1,8 +1,8 @@
 package com.greenapper.factories.campaign.impl;
 
-import com.greenapper.dtos.campaign.CampaignDTO;
-import com.greenapper.dtos.campaign.CouponCampaignDTO;
-import com.greenapper.dtos.campaign.OfferCampaignDTO;
+import com.greenapper.dtos.campaigns.CampaignDTO;
+import com.greenapper.dtos.campaigns.CouponCampaignDTO;
+import com.greenapper.dtos.campaigns.OfferCampaignDTO;
 import com.greenapper.factories.campaign.CampaignDTOFactory;
 import com.greenapper.models.campaigns.Campaign;
 import com.greenapper.models.campaigns.CouponCampaign;

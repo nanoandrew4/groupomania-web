@@ -1,7 +1,6 @@
-package com.greenapper.dtos.campaign;
+package com.greenapper.dtos.campaigns;
 
 import com.greenapper.enums.CampaignType;
-import com.greenapper.forms.campaigns.OfferCampaignForm;
 import com.greenapper.models.campaigns.OfferCampaign;
 import io.swagger.annotations.ApiModel;
 
@@ -12,7 +11,7 @@ public class OfferCampaignDTO extends CampaignDTO {
 	}
 
 	/**
-	 * Creates a {@link OfferCampaignForm} from an existing {@link OfferCampaign}.
+	 * Creates a {@link com.greenapper.dtos.campaigns.OfferCampaignDTO} from an existing {@link OfferCampaign}.
 	 *
 	 * @param offerCampaign Campaign model from which to copy the data
 	 */

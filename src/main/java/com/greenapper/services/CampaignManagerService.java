@@ -1,6 +1,6 @@
 package com.greenapper.services;
 
-import com.greenapper.dtos.campaign.CampaignDTO;
+import com.greenapper.dtos.campaigns.CampaignDTO;
 import com.greenapper.forms.PasswordUpdateForm;
 import com.greenapper.models.CampaignManager;
 import com.greenapper.models.campaigns.Campaign;
@@ -28,7 +28,7 @@ public interface CampaignManagerService {
 	 * @param campaign Campaign to add if it doesn't exist, or update if it is already present in the list of campaigns
 	 *                 associated to the session campaign manager
 	 */
-	void addOrUpdateCampaignForCampaignManager(final Campaign campaign);
+	void addOrUpdateCampaignForCampaignManager(final CampaignManager campaignManager, final Campaign campaign);
 
 	/**
 	 * Attempts to update the password for the {@link CampaignManager} currently in session.

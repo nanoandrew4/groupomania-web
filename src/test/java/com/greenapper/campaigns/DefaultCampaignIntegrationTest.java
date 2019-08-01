@@ -2,7 +2,7 @@ package com.greenapper.campaigns;
 
 import com.greenapper.Application;
 import com.greenapper.controllers.campaign.DefaultCampaignController;
-import com.greenapper.dtos.campaign.CampaignDTO;
+import com.greenapper.dtos.campaigns.CampaignDTO;
 import com.greenapper.enums.CampaignState;
 import com.greenapper.exceptions.UnknownIdentifierException;
 import com.greenapper.models.CampaignManager;

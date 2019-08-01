@@ -46,7 +46,7 @@ public class CampaignStateBroadcastConsumer {
 				campaign.setStartDate(LocalDate.now());
 			campaign.setEndDate(LocalDate.now());
 		}
-		campaignManagerService.addOrUpdateCampaignForCampaignManager(campaign);
+		campaignManagerService.addOrUpdateCampaignForCampaignManager(campaignStateUpdateOperation.getCampaignOwner(), campaign);
 		LOG.info("Updated campaign state for campaign with ID: " + campaign.getId() + " of type: " + campaign.getType()
 				 + " for user: " + campaign.getOwner().getId() + " and with new state: " + campaign.getState());
 	}

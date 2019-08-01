@@ -1,7 +1,7 @@
 package com.greenapper.services.impl;
 
 import com.greenapper.config.SecurityConfig;
-import com.greenapper.dtos.campaign.CampaignDTO;
+import com.greenapper.dtos.campaigns.CampaignDTO;
 import com.greenapper.exceptions.ValidationException;
 import com.greenapper.factories.campaign.CampaignDTOFactory;
 import com.greenapper.forms.PasswordUpdateForm;
@@ -58,8 +58,7 @@ public class DefaultCampaignManagerService implements CampaignManagerService {
 	}
 
 	@Override
-	public void addOrUpdateCampaignForCampaignManager(final Campaign campaign) {
-		final CampaignManager campaignManager = getSessionCampaignManager();
+	public void addOrUpdateCampaignForCampaignManager(final CampaignManager campaignManager, final Campaign campaign) {
 		campaignManager.getCampaigns().removeIf(campaign::equals);
 		campaignManager.getCampaigns().add(campaign);
 		campaignManagerRepository.save(campaignManager);

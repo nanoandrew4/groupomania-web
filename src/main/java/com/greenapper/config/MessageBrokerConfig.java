@@ -1,13 +1,16 @@
 package com.greenapper.config;
 
-import org.springframework.amqp.core.*;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.Arrays;
-import java.util.List;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 @Configuration
 @EnableRabbit
@@ -29,15 +32,32 @@ public class MessageBrokerConfig {
 	private String campaignStateRoutingKey;
 
 	@Bean
-	public List<Declarable> topicBindings() {
-		final Queue campaignQueue = new Queue(campaignQueueName, false);
-		final Queue campaignStateQueue = new Queue(campaignStateQueueName, false);
+	public Queue getCampaignQueue() {
+		return new Queue(campaignQueueName, false);
+	}
 
-		final TopicExchange topicExchange = new TopicExchange(campaignTopicExchange);
+	@Bean
+	public Queue getCampaignStateQueue() {
+		return new Queue(campaignStateQueueName, false);
+	}
 
-		final Binding campaignBinding = BindingBuilder.bind(campaignQueue).to(topicExchange).with(campaignRoutingKey);
-		final Binding campaignStateBinding = BindingBuilder.bind(campaignStateQueue).to(topicExchange).with(campaignStateRoutingKey);
+	@Bean
+	public TopicExchange getTopicExchange() {
+		return new TopicExchange(campaignTopicExchange);
+	}
 
-		return Arrays.asList(campaignQueue, campaignStateQueue, topicExchange, campaignBinding, campaignStateBinding);
+	@Bean
+	public Binding getCampaignBinding() {
+		return BindingBuilder.bind(getCampaignQueue()).to(getTopicExchange()).with(campaignRoutingKey);
+	}
+
+	@Bean
+	public Binding getCampaignStateBinding() {
+		return BindingBuilder.bind(getCampaignStateQueue()).to(getTopicExchange()).with(campaignStateRoutingKey);
+	}
+
+	@Bean
+	public MessageConverter jackson2Converter() {
+		return new Jackson2JsonMessageConverter(Jackson2ObjectMapperBuilder.json().build());
 	}
 }

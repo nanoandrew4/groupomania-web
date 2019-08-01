@@ -9,7 +9,6 @@ import com.greenapper.queues.PersistenceOperationType;
 import com.greenapper.repositories.CampaignRepository;
 import com.greenapper.services.CampaignManagerService;
 import com.greenapper.services.FileSystemStorageService;
-import com.greenapper.services.SessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -33,9 +32,6 @@ public class CampaignBroadcastConsumer {
 	@Autowired
 	private CampaignFactory campaignFactory;
 
-	@Autowired
-	private SessionService sessionService;
-
 	private Logger LOG = LoggerFactory.getLogger(CampaignBroadcastConsumer.class);
 
 	@RabbitListener(queues = {"${groupomania.rabbitmq.campaign.queue.name}"})
@@ -48,18 +44,21 @@ public class CampaignBroadcastConsumer {
 
 	private void createCampaign(final CampaignPersistenceOperation campaignPersistenceOperation) {
 		campaignFactory.createCampaignModel(campaignPersistenceOperation.getCampaignForm()).ifPresent(campaign -> {
-			campaign.setOwner((CampaignManager) sessionService.getSessionUser());
 			campaign.setState(CampaignState.INACTIVE);
 			campaignPersistenceOperation.getSetDefaultsForCampaign().accept(campaign);
-			saveCampaign(campaign, campaignPersistenceOperation.getCampaignForm());
+
+			final CampaignManager campaignOwner = campaignManagerService.getByUsername(campaignPersistenceOperation.getCampaignOwnerUsername()).orElse(null);
+			campaign.setOwner(campaignOwner);
+			saveCampaign(campaignOwner, campaign, campaignPersistenceOperation.getCampaignForm());
 			LOG.info("Created campaign with ID: " + campaign.getId() + " of type: " + campaign.getType() + " for user: " + campaign.getOwner().getId());
 		});
 	}
 
 	private void updateCampaign(final CampaignPersistenceOperation campaignPersistenceOperation) {
 		campaignFactory.createCampaignModel(campaignPersistenceOperation.getCampaignForm()).ifPresent(campaign -> {
-			campaign.setOwner((CampaignManager) sessionService.getSessionUser());
-			saveCampaign(campaign, campaignPersistenceOperation.getCampaignForm());
+			final CampaignManager campaignOwner = campaignManagerService.getByUsername(campaignPersistenceOperation.getCampaignOwnerUsername()).orElse(null);
+			campaign.setOwner(campaignOwner);
+			saveCampaign(campaignOwner, campaign, campaignPersistenceOperation.getCampaignForm());
 			LOG.info("Updated campaign with ID: " + campaign.getId() + " of type: " + campaign.getType() + " for user: " + campaign.getOwner().getId());
 		});
 	}
@@ -73,11 +72,11 @@ public class CampaignBroadcastConsumer {
 	 * @param campaignForm Campaign form from which the model was created, which possibly contains the
 	 *                     {@link org.springframework.web.multipart.MultipartFile} that will be persisted to the file system
 	 */
-	private void saveCampaign(final Campaign campaign, final CampaignForm campaignForm) {
+	private void saveCampaign(final CampaignManager campaignOwner, final Campaign campaign, final CampaignForm campaignForm) {
 		final String imagePath = fileSystemStorageService.saveImage(campaignForm.getCampaignImage());
 		Optional.ofNullable(imagePath).ifPresent(campaign::setCampaignImageFilePath);
 
 		campaignRepository.save(campaign);
-		campaignManagerService.addOrUpdateCampaignForCampaignManager(campaign);
+		campaignManagerService.addOrUpdateCampaignForCampaignManager(campaignOwner, campaign);
 	}
 }

@@ -1,6 +1,6 @@
 package com.greenapper.services;
 
-import com.greenapper.dtos.campaign.CampaignDTO;
+import com.greenapper.dtos.campaigns.CampaignDTO;
 import com.greenapper.enums.CampaignState;
 import com.greenapper.factories.campaign.impl.DefaultCampaignDTOFactory;
 import com.greenapper.models.CampaignManager;
@@ -71,7 +71,7 @@ public class DefaultCampaignManagerServiceUnitTest {
 			return null;
 		}).when(campaignManagerRepository).save(any());
 
-		campaignManagerService.addOrUpdateCampaignForCampaignManager(getMinimalOfferCampaign());
+		campaignManagerService.addOrUpdateCampaignForCampaignManager((CampaignManager) sessionService.getSessionUser(), getMinimalOfferCampaign());
 
 		final List<Campaign> campaigns = ((CampaignManager) sessionService.getSessionUser()).getCampaigns();
 		assertEquals(1L, campaigns.size());
@@ -84,11 +84,11 @@ public class DefaultCampaignManagerServiceUnitTest {
 			return null;
 		}).when(campaignManagerRepository).save(any());
 
-		campaignManagerService.addOrUpdateCampaignForCampaignManager(getMinimalOfferCampaign());
+		campaignManagerService.addOrUpdateCampaignForCampaignManager((CampaignManager) sessionService.getSessionUser(), getMinimalOfferCampaign());
 
 		final Campaign campaign = getMinimalOfferCampaign();
 		campaign.setTitle("Updated title");
-		campaignManagerService.addOrUpdateCampaignForCampaignManager(campaign);
+		campaignManagerService.addOrUpdateCampaignForCampaignManager((CampaignManager) sessionService.getSessionUser(), campaign);
 
 		final List<Campaign> campaigns = ((CampaignManager) sessionService.getSessionUser()).getCampaigns();
 		assertEquals(1L, campaigns.size());

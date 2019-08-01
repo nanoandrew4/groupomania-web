@@ -16,4 +16,4 @@ done
 cd ../../
 mvn clean spring-boot:run
 cd docker/dev/
-docker-compose down
+#docker-compose down
