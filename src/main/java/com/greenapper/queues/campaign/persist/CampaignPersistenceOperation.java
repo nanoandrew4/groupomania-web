@@ -3,10 +3,7 @@ package com.greenapper.queues.campaign.persist;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.greenapper.forms.campaigns.CampaignForm;
 import com.greenapper.jackson.deserializers.CampaignFormDeserializer;
-import com.greenapper.models.campaigns.Campaign;
 import com.greenapper.queues.PersistenceOperationType;
-
-import java.util.function.Consumer;
 
 public class CampaignPersistenceOperation {
 
@@ -17,26 +14,15 @@ public class CampaignPersistenceOperation {
 
 	private PersistenceOperationType operationType;
 
-	private Consumer<Campaign> setDefaultsForCampaign;
-
 	public CampaignPersistenceOperation() {
 
 	}
 
 	public CampaignPersistenceOperation(final CampaignForm campaignForm, final PersistenceOperationType operationType,
-										final Consumer<Campaign> setDefaultsForCampaign, final String campaignOwnerUsername) {
+										final String campaignOwnerUsername) {
 		this.campaignForm = campaignForm;
 		this.campaignOwnerUsername = campaignOwnerUsername;
 		this.operationType = operationType;
-		this.setDefaultsForCampaign = setDefaultsForCampaign;
-	}
-
-	public Consumer<Campaign> getSetDefaultsForCampaign() {
-		return setDefaultsForCampaign;
-	}
-
-	public void setSetDefaultsForCampaign(Consumer<Campaign> setDefaultsForCampaign) {
-		this.setDefaultsForCampaign = setDefaultsForCampaign;
 	}
 
 	public PersistenceOperationType getOperationType() {

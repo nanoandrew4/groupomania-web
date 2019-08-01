@@ -2,6 +2,7 @@ package com.greenapper.services;
 
 import com.greenapper.dtos.campaigns.CampaignDTO;
 import com.greenapper.enums.CampaignType;
+import com.greenapper.forms.campaigns.CampaignForm;
 import com.greenapper.models.campaigns.Campaign;
 import org.springframework.validation.Errors;
 
@@ -52,9 +53,9 @@ public interface CampaignService {
 	 * This method allows campaign subtypes to set default values for their fields before entering validation and
 	 * persisting the entity, such as fields extracted from other entities (like the users name, or email).
 	 *
-	 * @param campaign Campaign to which to assign the default values deemed necessary by the implementation of this method
+	 * @param campaignSubtype Campaign form to which to assign the default values deemed necessary by the implementation of this method
 	 */
-	void setDefaultsForCampaignSubtype(final Campaign campaign);
+	void setDefaultsForCampaignSubtype(final CampaignForm campaignSubtype);
 
 	/**
 	 * Returns a {@link Campaign} given its ID, converted to a DTO, or an empty optional if it does not exist.

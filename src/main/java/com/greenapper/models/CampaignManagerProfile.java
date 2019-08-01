@@ -32,7 +32,7 @@ public class CampaignManagerProfile {
 		Optional.ofNullable(profileForm.getCampaignManager()).ifPresent(this::setCampaignManager);
 		Optional.ofNullable(profileForm.getName()).ifPresent(this::setName);
 		Optional.ofNullable(profileForm.getEmail()).ifPresent(this::setEmail);
-		Optional.ofNullable(profileForm.getEmail()).ifPresent(this::setAddress);
+		Optional.ofNullable(profileForm.getAddress()).ifPresent(this::setAddress);
 	}
 
 	public Long getId() {

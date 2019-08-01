@@ -47,7 +47,7 @@ public class DefaultFileSystemStoreServiceUnitTest {
 			random.nextBytes(bytes);
 			imageForm.setBytes(bytes);
 
-			final String generatedFileName = fileSystemStorageService.generateFileNameForStorage(imageForm, "png");
+			final String generatedFileName = fileSystemStorageService.generateFileNameForStorage(sessionService.getSessionUser().getUsername(), imageForm, "png");
 
 			if (generatedFileName.contains(" "))
 				fail("Generated file name with seed: " + seed + " contains a space, which is illegal");

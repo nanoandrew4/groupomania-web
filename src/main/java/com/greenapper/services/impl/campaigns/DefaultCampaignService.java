@@ -5,7 +5,6 @@ import com.greenapper.exceptions.UnknownIdentifierException;
 import com.greenapper.exceptions.ValidationException;
 import com.greenapper.factories.campaign.CampaignDTOFactory;
 import com.greenapper.forms.campaigns.CampaignForm;
-import com.greenapper.models.CampaignManager;
 import com.greenapper.models.campaigns.Campaign;
 import com.greenapper.queues.PersistenceOperationType;
 import com.greenapper.queues.campaign.persist.CampaignBroadcastProducer;
@@ -51,9 +50,9 @@ public abstract class DefaultCampaignService implements CampaignService {
 		if (errors.hasErrors())
 			throw new ValidationException("Validation errors where encountered when updating a campaign", errors);
 
+		setDefaultsForCampaignSubtype(campaignForm);
 		campaignBroadcastProducer.persistOperation(
-				new CampaignPersistenceOperation(campaignForm, PersistenceOperationType.CREATE,
-												 this::setDefaultsForCampaignSubtype, sessionService.getSessionUser().getUsername()));
+				new CampaignPersistenceOperation(campaignForm, PersistenceOperationType.CREATE, sessionService.getSessionUser().getUsername()));
 		LOG.info("Successfully enqueued campaign creation for user with id: " + sessionService.getSessionUser().getId());
 	}
 
@@ -68,8 +67,7 @@ public abstract class DefaultCampaignService implements CampaignService {
 			throw new ValidationException("Validation errors where encountered when updating a campaign", errors);
 
 		campaignBroadcastProducer.persistOperation(
-				new CampaignPersistenceOperation(campaignForm, PersistenceOperationType.UPDATE,
-												 null, sessionService.getSessionUser().getUsername()));
+				new CampaignPersistenceOperation(campaignForm, PersistenceOperationType.UPDATE, sessionService.getSessionUser().getUsername()));
 		LOG.info("Successfully enqueued campaign modification for user with id: " + sessionService.getSessionUser().getId() +
 				 " and campaign with id: " + campaignForm.getId());
 	}
@@ -77,7 +75,7 @@ public abstract class DefaultCampaignService implements CampaignService {
 	@Override
 	public void updateCampaignState(final Long id, final String state) {
 		campaignStateBroadcastProducer.enqueueCampaignStateUpdateOperation(
-				new CampaignStateUpdateOperation((CampaignManager) sessionService.getSessionUser(), id, state));
+				new CampaignStateUpdateOperation(sessionService.getSessionUser().getUsername(), id, state));
 		LOG.info("Successfully enqueued campaign state modification for user with id: " + sessionService.getSessionUser().getId() +
 				 " and campaign with id: " + id);
 	}

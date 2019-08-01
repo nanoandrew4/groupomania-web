@@ -1,10 +1,11 @@
 package com.greenapper.queues.campaign.persist.state;
 
 import com.greenapper.enums.CampaignState;
+import com.greenapper.exceptions.UnknownIdentifierException;
+import com.greenapper.models.CampaignManager;
 import com.greenapper.models.campaigns.Campaign;
 import com.greenapper.repositories.CampaignRepository;
 import com.greenapper.services.CampaignManagerService;
-import com.greenapper.services.SessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -21,9 +22,6 @@ public class CampaignStateBroadcastConsumer {
 	private CampaignRepository campaignRepository;
 
 	@Autowired
-	private SessionService sessionService;
-
-	@Autowired
 	private CampaignManagerService campaignManagerService;
 
 	private Logger LOG = LoggerFactory.getLogger(CampaignStateBroadcastConsumer.class);
@@ -33,7 +31,12 @@ public class CampaignStateBroadcastConsumer {
 		final Long id = campaignStateUpdateOperation.getTargetCampaignId();
 		final String state = campaignStateUpdateOperation.getTargetNewState();
 
-		final Predicate<Campaign> filterByOwner = campaign -> campaign.getOwner().getId().equals(sessionService.getSessionUser().getId());
+		final CampaignManager campaignManager = campaignManagerService.getByUsername(campaignStateUpdateOperation.getCampaignOwnerUsername()).orElse(null);
+
+		if (campaignManager == null)
+			throw new UnknownIdentifierException("The user with usernam: " + campaignStateUpdateOperation.getCampaignOwnerUsername() + " could not be retrieved for the campaign state update operation");
+
+		final Predicate<Campaign> filterByOwner = campaign -> campaign.getOwner().getId().equals(campaignManager.getId());
 		final Campaign campaign = campaignRepository.findById(id).filter(filterByOwner).orElse(null);
 		if (campaign == null) {
 			LOG.error("Could not update state for non-existent campaign with id: " + id);
@@ -46,7 +49,7 @@ public class CampaignStateBroadcastConsumer {
 				campaign.setStartDate(LocalDate.now());
 			campaign.setEndDate(LocalDate.now());
 		}
-		campaignManagerService.addOrUpdateCampaignForCampaignManager(campaignStateUpdateOperation.getCampaignOwner(), campaign);
+		campaignManagerService.addOrUpdateCampaignForCampaignManager(campaignManager, campaign);
 		LOG.info("Updated campaign state for campaign with ID: " + campaign.getId() + " of type: " + campaign.getType()
 				 + " for user: " + campaign.getOwner().getId() + " and with new state: " + campaign.getState());
 	}

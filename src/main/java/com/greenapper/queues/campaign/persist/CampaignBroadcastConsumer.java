@@ -1,6 +1,7 @@
 package com.greenapper.queues.campaign.persist;
 
 import com.greenapper.enums.CampaignState;
+import com.greenapper.exceptions.UnknownIdentifierException;
 import com.greenapper.factories.campaign.CampaignFactory;
 import com.greenapper.forms.campaigns.CampaignForm;
 import com.greenapper.models.CampaignManager;
@@ -45,18 +46,25 @@ public class CampaignBroadcastConsumer {
 	private void createCampaign(final CampaignPersistenceOperation campaignPersistenceOperation) {
 		campaignFactory.createCampaignModel(campaignPersistenceOperation.getCampaignForm()).ifPresent(campaign -> {
 			campaign.setState(CampaignState.INACTIVE);
-			campaignPersistenceOperation.getSetDefaultsForCampaign().accept(campaign);
 
 			final CampaignManager campaignOwner = campaignManagerService.getByUsername(campaignPersistenceOperation.getCampaignOwnerUsername()).orElse(null);
+
+			if (campaignOwner == null)
+				throw new UnknownIdentifierException("The user with usernam: " + campaignPersistenceOperation.getCampaignOwnerUsername() + " could not be retrieved for the campaign update operation");
+
 			campaign.setOwner(campaignOwner);
 			saveCampaign(campaignOwner, campaign, campaignPersistenceOperation.getCampaignForm());
-			LOG.info("Created campaign with ID: " + campaign.getId() + " of type: " + campaign.getType() + " for user: " + campaign.getOwner().getId());
+			LOG.info("Created campaign of type: " + campaign.getType() + " for user: " + campaign.getOwner().getId());
 		});
 	}
 
 	private void updateCampaign(final CampaignPersistenceOperation campaignPersistenceOperation) {
 		campaignFactory.createCampaignModel(campaignPersistenceOperation.getCampaignForm()).ifPresent(campaign -> {
 			final CampaignManager campaignOwner = campaignManagerService.getByUsername(campaignPersistenceOperation.getCampaignOwnerUsername()).orElse(null);
+
+			if (campaignOwner == null)
+				throw new UnknownIdentifierException("The user with usernam: " + campaignPersistenceOperation.getCampaignOwnerUsername() + " could not be retrieved for the campaign update operation");
+
 			campaign.setOwner(campaignOwner);
 			saveCampaign(campaignOwner, campaign, campaignPersistenceOperation.getCampaignForm());
 			LOG.info("Updated campaign with ID: " + campaign.getId() + " of type: " + campaign.getType() + " for user: " + campaign.getOwner().getId());
@@ -73,10 +81,9 @@ public class CampaignBroadcastConsumer {
 	 *                     {@link org.springframework.web.multipart.MultipartFile} that will be persisted to the file system
 	 */
 	private void saveCampaign(final CampaignManager campaignOwner, final Campaign campaign, final CampaignForm campaignForm) {
-		final String imagePath = fileSystemStorageService.saveImage(campaignForm.getCampaignImage());
+		final String imagePath = fileSystemStorageService.saveImage(campaignOwner.getUsername(), campaignForm.getCampaignImage());
 		Optional.ofNullable(imagePath).ifPresent(campaign::setCampaignImageFilePath);
 
-		campaignRepository.save(campaign);
 		campaignManagerService.addOrUpdateCampaignForCampaignManager(campaignOwner, campaign);
 	}
 }

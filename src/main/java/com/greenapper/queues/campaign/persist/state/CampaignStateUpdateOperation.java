@@ -1,20 +1,18 @@
 package com.greenapper.queues.campaign.persist.state;
 
-import com.greenapper.models.CampaignManager;
-
 public class CampaignStateUpdateOperation {
 	private Long targetCampaignId;
 
 	private String targetNewState;
 
-	private CampaignManager campaignOwner;
+	private String campaignOwnerUsername;
 
 	public CampaignStateUpdateOperation() {
 
 	}
 
-	public CampaignStateUpdateOperation(final CampaignManager campaignOwner, final Long targetCampaignId, final String targetNewState) {
-		this.campaignOwner = campaignOwner;
+	public CampaignStateUpdateOperation(final String campaignOwnerUsername, final Long targetCampaignId, final String targetNewState) {
+		this.campaignOwnerUsername = campaignOwnerUsername;
 		this.targetCampaignId = targetCampaignId;
 		this.targetNewState = targetNewState;
 	}
@@ -35,11 +33,11 @@ public class CampaignStateUpdateOperation {
 		this.targetCampaignId = targetCampaignId;
 	}
 
-	public CampaignManager getCampaignOwner() {
-		return campaignOwner;
+	public String getCampaignOwnerUsername() {
+		return campaignOwnerUsername;
 	}
 
-	public void setCampaignOwner(CampaignManager campaignOwner) {
-		this.campaignOwner = campaignOwner;
+	public void setCampaignOwnerUsername(String campaignOwnerUsername) {
+		this.campaignOwnerUsername = campaignOwnerUsername;
 	}
 }

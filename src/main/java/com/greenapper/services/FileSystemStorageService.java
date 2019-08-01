@@ -13,7 +13,7 @@ public interface FileSystemStorageService {
 	 * @param image Multipart file containing the image to store
 	 * @return The path the file was stored to, or null if it was not stored
 	 */
-	String saveImage(final ImageForm image);
+	String saveImage(final String ownerUsername, final ImageForm image);
 
 	/**
 	 * Attempts to retrieve a previously stored image given its path.

@@ -2,8 +2,7 @@ package com.greenapper.services.impl.campaigns;
 
 import com.greenapper.dtos.CampaignManagerProfileDTO;
 import com.greenapper.forms.campaigns.CampaignForm;
-import com.greenapper.models.campaigns.Campaign;
-import com.greenapper.models.campaigns.CouponCampaign;
+import com.greenapper.forms.campaigns.CouponCampaignForm;
 import com.greenapper.services.CampaignManagerProfileService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
@@ -26,8 +25,8 @@ public class CouponCampaignService extends DefaultCampaignService {
 	}
 
 	@Override
-	public void setDefaultsForCampaignSubtype(final Campaign campaignSubtype) {
-		final CouponCampaign couponCampaign = (CouponCampaign) campaignSubtype;
+	public void setDefaultsForCampaignSubtype(final CampaignForm campaignSubtype) {
+		final CouponCampaignForm couponCampaign = (CouponCampaignForm) campaignSubtype;
 		final CampaignManagerProfileDTO sessionProfile = campaignManagerProfileService.getProfileForCurrentUser();
 
 		if (couponCampaign.getCampaignManagerName() == null || couponCampaign.getCampaignManagerName().trim().isEmpty())

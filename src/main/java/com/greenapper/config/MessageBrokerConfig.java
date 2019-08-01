@@ -31,29 +31,69 @@ public class MessageBrokerConfig {
 	@Value("${groupomania.rabbitmq.campaign.state.queue.routingKey}")
 	private String campaignStateRoutingKey;
 
+	@Value("${groupomania.rabbitmq.user.queue.exchange}")
+	private String usersTopicExchange;
+
+	@Value("${groupomania.rabbitmq.user.campaignmanager.password.queue.name}")
+	private String userPasswordQueueName;
+
+	@Value("${groupomania.rabbitmq.user.campaignmanager.password.queue.routingKey}")
+	private String userPasswordRoutingKey;
+
+	@Value("${groupomania.rabbitmq.user.campaignmanager.profile.queue.name}")
+	private String userProfileQueueName;
+
+	@Value("${groupomania.rabbitmq.user.campaignmanager.profile.queue.routingKey}")
+	private String userProfileRoutingKey;
+
 	@Bean
-	public Queue getCampaignQueue() {
+	public Queue campaignQueue() {
 		return new Queue(campaignQueueName, false);
 	}
 
 	@Bean
-	public Queue getCampaignStateQueue() {
+	public Queue campaignStateQueue() {
 		return new Queue(campaignStateQueueName, false);
 	}
 
 	@Bean
-	public TopicExchange getTopicExchange() {
+	public Queue usersCampaignManagerQueue() {
+		return new Queue(userPasswordQueueName, false);
+	}
+
+	@Bean
+	public Queue usersCampaignManagerProfileQueue() {
+		return new Queue(userProfileQueueName, false);
+	}
+
+	@Bean
+	public TopicExchange usersTopicExchange() {
+		return new TopicExchange(usersTopicExchange);
+	}
+
+	@Bean
+	public TopicExchange campaignTopicExchange() {
 		return new TopicExchange(campaignTopicExchange);
 	}
 
 	@Bean
-	public Binding getCampaignBinding() {
-		return BindingBuilder.bind(getCampaignQueue()).to(getTopicExchange()).with(campaignRoutingKey);
+	public Binding campaignBinding() {
+		return BindingBuilder.bind(campaignQueue()).to(campaignTopicExchange()).with(campaignRoutingKey);
 	}
 
 	@Bean
-	public Binding getCampaignStateBinding() {
-		return BindingBuilder.bind(getCampaignStateQueue()).to(getTopicExchange()).with(campaignStateRoutingKey);
+	public Binding campaignStateBinding() {
+		return BindingBuilder.bind(campaignStateQueue()).to(campaignTopicExchange()).with(campaignStateRoutingKey);
+	}
+
+	@Bean
+	public Binding usersCampaignManagerBinding() {
+		return BindingBuilder.bind(usersCampaignManagerQueue()).to(usersTopicExchange()).with(userPasswordRoutingKey);
+	}
+
+	@Bean
+	public Binding usersProfileBinding() {
+		return BindingBuilder.bind(usersCampaignManagerProfileQueue()).to(usersTopicExchange()).with(userProfileRoutingKey);
 	}
 
 	@Bean

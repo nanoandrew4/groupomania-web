@@ -55,25 +55,25 @@ public class CampaignFormDeserializer extends StdDeserializer<CampaignForm> {
 
 	private void commonPopulate(final CampaignForm campaignForm, final JsonNode rootNode) {
 		Optional.ofNullable(rootNode.get("id")).map(JsonNode::asLong).ifPresent(campaignForm::setId);
-		Optional.ofNullable(rootNode.get("title")).map(JsonNode::asText).ifPresent(campaignForm::setTitle);
-		Optional.ofNullable(rootNode.get("description")).map(JsonNode::asText).ifPresent(campaignForm::setDescription);
-		Optional.ofNullable(rootNode.get("campaignImageFilePath")).map(JsonNode::asText).ifPresent(campaignForm::setCampaignImageFilePath);
-		Optional.ofNullable(rootNode.get("state")).map(JsonNode::asText).map(CampaignState::valueOf).ifPresent(campaignForm::setState);
-		Optional.ofNullable(rootNode.get("startDate")).map(JsonNode::asText).ifPresent(campaignForm::setStartDate);
-		Optional.ofNullable(rootNode.get("endDate")).map(JsonNode::asText).ifPresent(campaignForm::setEndDate);
-		Optional.ofNullable(rootNode.get("quantity")).map(JsonNode::asText).ifPresent(campaignForm::setQuantity);
+		Optional.ofNullable(rootNode.get("title").asText(null)).ifPresent(campaignForm::setTitle);
+		Optional.ofNullable(rootNode.get("description").asText(null)).ifPresent(campaignForm::setDescription);
+		Optional.ofNullable(rootNode.get("campaignImageFilePath").asText(null)).ifPresent(campaignForm::setCampaignImageFilePath);
+		Optional.ofNullable(rootNode.get("state").asText(null)).map(CampaignState::valueOf).ifPresent(campaignForm::setState);
+		Optional.ofNullable(rootNode.get("startDate").asText(null)).ifPresent(campaignForm::setStartDate);
+		Optional.ofNullable(rootNode.get("endDate").asText(null)).ifPresent(campaignForm::setEndDate);
+		Optional.ofNullable(rootNode.get("quantity").asText(null)).ifPresent(campaignForm::setQuantity);
 		Optional.ofNullable(rootNode.get("showAfterExpiration")).map(JsonNode::asBoolean).ifPresent(campaignForm::setShowAfterExpiration);
-		Optional.ofNullable(rootNode.get("originalPrice")).map(JsonNode::asText).ifPresent(campaignForm::setOriginalPrice);
-		Optional.ofNullable(rootNode.get("percentDiscount")).map(JsonNode::asText).ifPresent(campaignForm::setPercentDiscount);
-		Optional.ofNullable(rootNode.get("discountedPrice")).map(JsonNode::asText).ifPresent(campaignForm::setDiscountedPrice);
+		Optional.ofNullable(rootNode.get("originalPrice").asText(null)).ifPresent(campaignForm::setOriginalPrice);
+		Optional.ofNullable(rootNode.get("percentDiscount").asText(null)).ifPresent(campaignForm::setPercentDiscount);
+		Optional.ofNullable(rootNode.get("discountedPrice").asText(null)).ifPresent(campaignForm::setDiscountedPrice);
 	}
 
 	private void populateCouponCampaign(final CouponCampaignForm campaignDTO, final JsonNode rootNode) {
-		Optional.ofNullable(rootNode.get("couponDescription")).map(JsonNode::asText).ifPresent(campaignDTO::setCouponDescription);
-		Optional.ofNullable(rootNode.get("campaignManagerName")).map(JsonNode::asText).ifPresent(campaignDTO::setCampaignManagerName);
-		Optional.ofNullable(rootNode.get("campaignManagerEmail")).map(JsonNode::asText).ifPresent(campaignDTO::setCampaignManagerEmail);
-		Optional.ofNullable(rootNode.get("campaignManagerAddress")).map(JsonNode::asText).ifPresent(campaignDTO::setCampaignManagerAddress);
-		Optional.ofNullable(rootNode.get("couponStartDate")).map(JsonNode::asText).ifPresent(campaignDTO::setCouponStartDate);
-		Optional.ofNullable(rootNode.get("couponEndDate")).map(JsonNode::asText).ifPresent(campaignDTO::setCouponEndDate);
+		Optional.ofNullable(rootNode.get("couponDescription").asText(null)).ifPresent(campaignDTO::setCouponDescription);
+		Optional.ofNullable(rootNode.get("campaignManagerName").asText(null)).ifPresent(campaignDTO::setCampaignManagerName);
+		Optional.ofNullable(rootNode.get("campaignManagerEmail").asText(null)).ifPresent(campaignDTO::setCampaignManagerEmail);
+		Optional.ofNullable(rootNode.get("campaignManagerAddress").asText(null)).ifPresent(campaignDTO::setCampaignManagerAddress);
+		Optional.ofNullable(rootNode.get("couponStartDate").asText(null)).ifPresent(campaignDTO::setCouponStartDate);
+		Optional.ofNullable(rootNode.get("couponEndDate").asText(null)).ifPresent(campaignDTO::setCouponEndDate);
 	}
 }
