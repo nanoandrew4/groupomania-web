@@ -8,7 +8,6 @@ public class ProfileUpdateOperation {
 	private String profileUpdateUser;
 
 	public ProfileUpdateOperation() {
-
 	}
 
 	public ProfileUpdateOperation(final CampaignManagerProfileForm profileForm, final String profileUpdateUser) {

@@ -28,7 +28,7 @@ public class ProfileUpdateBroadcastConsumer {
 	private Logger LOG = LoggerFactory.getLogger(this.getClass());
 
 	@RabbitListener(queues = {"${groupomania.rabbitmq.user.campaignmanager.profile.queue.name}"})
-	public void updatePassword(final ProfileUpdateOperation profileUpdateOperation) {
+	public void updateProfile(final ProfileUpdateOperation profileUpdateOperation) {
 		final CampaignManager campaignManager = campaignManagerRepository.findByUsername(profileUpdateOperation.getProfileUpdateUser());
 		final CampaignManagerProfile profile = campaignManagerProfileRepository.findById(campaignManager.getId()).orElseGet(CampaignManagerProfile::new);
 		profile.populate(profileUpdateOperation.getProfileForm());

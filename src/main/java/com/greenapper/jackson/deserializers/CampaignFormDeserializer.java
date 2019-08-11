@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.greenapper.enums.CampaignState;
 import com.greenapper.enums.CampaignType;
+import com.greenapper.forms.ImageForm;
 import com.greenapper.forms.campaigns.CampaignForm;
 import com.greenapper.forms.campaigns.CouponCampaignForm;
 import com.greenapper.forms.campaigns.OfferCampaignForm;
@@ -66,6 +67,24 @@ public class CampaignFormDeserializer extends StdDeserializer<CampaignForm> {
 		Optional.ofNullable(rootNode.get("originalPrice").asText(null)).ifPresent(campaignForm::setOriginalPrice);
 		Optional.ofNullable(rootNode.get("percentDiscount").asText(null)).ifPresent(campaignForm::setPercentDiscount);
 		Optional.ofNullable(rootNode.get("discountedPrice").asText(null)).ifPresent(campaignForm::setDiscountedPrice);
+
+		final JsonNode campaignImageNode = rootNode.get("campaignImage");
+		if (!campaignImageNode.isNull())
+			campaignForm.setCampaignImage(populateImageForm(campaignImageNode));
+	}
+
+	private ImageForm populateImageForm(final JsonNode campaignImageNode) {
+		final ImageForm imageForm = new ImageForm();
+		imageForm.setName(campaignImageNode.get("name").asText());
+		imageForm.setType(campaignImageNode.get("type").asText());
+		imageForm.setSize(campaignImageNode.get("size").asLong());
+		try {
+			imageForm.setBytes(campaignImageNode.get("bytes").binaryValue());
+			return imageForm;
+		} catch (IOException e) {
+			LOG.error("Error decoding bytes from ImageForm", e);
+			return null;
+		}
 	}
 
 	private void populateCouponCampaign(final CouponCampaignForm campaignDTO, final JsonNode rootNode) {
