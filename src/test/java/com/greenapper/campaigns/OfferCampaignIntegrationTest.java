@@ -1,6 +1,7 @@
 package com.greenapper.campaigns;
 
 import com.greenapper.Application;
+import com.greenapper.config.MessageBrokerConfig;
 import com.greenapper.controllers.campaign.OfferCampaignController;
 import com.greenapper.enums.CampaignState;
 import com.greenapper.exceptions.ValidationException;
@@ -56,6 +57,9 @@ public class OfferCampaignIntegrationTest {
 
 	@Autowired
 	private CampaignFormFactory campaignFormFactory;
+
+	@Autowired
+	private MessageBrokerConfig messageBrokerConfig;
 
 	@Before
 	public void setup() {
@@ -285,6 +289,9 @@ public class OfferCampaignIntegrationTest {
 
 		offerCampaignController.createCampaign(campaignForm, errors);
 
+		messageBrokerConfig.sleepWhileOperationsPending(messageBrokerConfig.campaignQueue());
+		sessionService.setSessionUser(campaignManagerService.getByUsername("admin").orElse(null));
+
 		assertFalse(errors.hasErrors());
 		assertFalse(((CampaignManager) sessionService.getSessionUser()).getCampaigns().isEmpty());
 		assertEquals(initCampaignCount + 1, ((CampaignManager) sessionService.getSessionUser()).getCampaigns().size());
@@ -305,6 +312,9 @@ public class OfferCampaignIntegrationTest {
 		campaignForm.setShowAfterExpiration(true);
 
 		offerCampaignController.updateCampaign(campaignForm, errors);
+
+		messageBrokerConfig.sleepWhileOperationsPending(messageBrokerConfig.campaignQueue());
+		sessionService.setSessionUser(campaignManagerService.getByUsername("admin").orElse(null));
 
 		final OfferCampaignForm updatedForm = getCampaignFormToUpdate();
 

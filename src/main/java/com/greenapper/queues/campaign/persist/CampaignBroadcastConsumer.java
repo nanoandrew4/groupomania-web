@@ -50,7 +50,7 @@ public class CampaignBroadcastConsumer {
 			final CampaignManager campaignOwner = campaignManagerService.getByUsername(campaignPersistenceOperation.getCampaignOwnerUsername()).orElse(null);
 
 			if (campaignOwner == null)
-				throw new UnknownIdentifierException("The user with usernam: " + campaignPersistenceOperation.getCampaignOwnerUsername() + " could not be retrieved for the campaign update operation");
+				throw new UnknownIdentifierException("The user with username: " + campaignPersistenceOperation.getCampaignOwnerUsername() + " could not be retrieved for the campaign update operation");
 
 			campaign.setOwner(campaignOwner);
 			saveCampaign(campaignOwner, campaign, campaignPersistenceOperation.getCampaignForm());

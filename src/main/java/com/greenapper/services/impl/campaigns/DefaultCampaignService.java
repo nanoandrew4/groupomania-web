@@ -5,6 +5,7 @@ import com.greenapper.exceptions.UnknownIdentifierException;
 import com.greenapper.exceptions.ValidationException;
 import com.greenapper.factories.campaign.CampaignDTOFactory;
 import com.greenapper.forms.campaigns.CampaignForm;
+import com.greenapper.models.CampaignManager;
 import com.greenapper.models.campaigns.Campaign;
 import com.greenapper.queues.PersistenceOperationType;
 import com.greenapper.queues.campaign.persist.CampaignBroadcastProducer;
@@ -74,6 +75,10 @@ public abstract class DefaultCampaignService implements CampaignService {
 
 	@Override
 	public void updateCampaignState(final Long id, final String state) {
+		final CampaignManager campaignManager = (CampaignManager) sessionService.getSessionUser();
+		if (campaignManager == null || campaignManager.getCampaigns() == null || campaignManager.getCampaigns().stream().map(Campaign::getId).noneMatch(id::equals))
+			throw new UnknownIdentifierException("The user in session has no campaign with id: " + id);
+
 		campaignStateBroadcastProducer.enqueueCampaignStateUpdateOperation(
 				new CampaignStateUpdateOperation(sessionService.getSessionUser().getUsername(), id, state));
 		LOG.info("Successfully enqueued campaign state modification for user with id: " + sessionService.getSessionUser().getId() +
