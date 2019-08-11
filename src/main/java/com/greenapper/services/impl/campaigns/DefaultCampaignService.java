@@ -1,28 +1,27 @@
 package com.greenapper.services.impl.campaigns;
 
-import com.greenapper.dtos.campaign.CampaignDTO;
-import com.greenapper.enums.CampaignState;
+import com.greenapper.dtos.campaigns.CampaignDTO;
 import com.greenapper.exceptions.UnknownIdentifierException;
 import com.greenapper.exceptions.ValidationException;
 import com.greenapper.factories.campaign.CampaignDTOFactory;
-import com.greenapper.factories.campaign.CampaignFactory;
 import com.greenapper.forms.campaigns.CampaignForm;
 import com.greenapper.models.CampaignManager;
 import com.greenapper.models.campaigns.Campaign;
+import com.greenapper.queues.PersistenceOperationType;
+import com.greenapper.queues.campaign.persist.CampaignBroadcastProducer;
+import com.greenapper.queues.campaign.persist.CampaignPersistenceOperation;
+import com.greenapper.queues.campaign.persist.state.CampaignStateBroadcastProducer;
+import com.greenapper.queues.campaign.persist.state.CampaignStateUpdateOperation;
 import com.greenapper.repositories.CampaignRepository;
-import com.greenapper.services.CampaignManagerService;
 import com.greenapper.services.CampaignService;
-import com.greenapper.services.FileSystemStorageService;
 import com.greenapper.services.SessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.Errors;
 
-import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -32,19 +31,16 @@ public abstract class DefaultCampaignService implements CampaignService {
 	private CampaignRepository campaignRepository;
 
 	@Autowired
-	private CampaignManagerService campaignManagerService;
-
-	@Autowired
 	private SessionService sessionService;
 
 	@Autowired
-	private FileSystemStorageService fileSystemStorageService;
-
-	@Autowired
-	private CampaignFactory campaignFactory;
-
-	@Autowired
 	private CampaignDTOFactory campaignDTOFactory;
+
+	@Autowired
+	private CampaignBroadcastProducer campaignBroadcastProducer;
+
+	@Autowired
+	private CampaignStateBroadcastProducer campaignStateBroadcastProducer;
 
 	private Logger LOG = LoggerFactory.getLogger(this.getClass());
 
@@ -55,13 +51,10 @@ public abstract class DefaultCampaignService implements CampaignService {
 		if (errors.hasErrors())
 			throw new ValidationException("Validation errors where encountered when updating a campaign", errors);
 
-		campaignFactory.createCampaignModel(campaignForm).ifPresent(campaign -> {
-			campaign.setOwner(getSessionCampaignManager());
-			campaign.setState(CampaignState.INACTIVE);
-			setDefaultsForCampaignSubtype(campaign);
-			saveCampaign(campaign, campaignForm);
-			LOG.info("Created campaign with ID: " + campaign.getId() + " of type: " + campaign.getType() + " for user: " + campaign.getOwner().getId());
-		});
+		setDefaultsForCampaignSubtype(campaignForm);
+		campaignBroadcastProducer.persistOperation(
+				new CampaignPersistenceOperation(campaignForm, PersistenceOperationType.CREATE, sessionService.getSessionUser().getUsername()));
+		LOG.info("Successfully enqueued campaign creation for user with id: " + sessionService.getSessionUser().getId());
 	}
 
 	@Override
@@ -74,29 +67,22 @@ public abstract class DefaultCampaignService implements CampaignService {
 		if (errors.hasErrors())
 			throw new ValidationException("Validation errors where encountered when updating a campaign", errors);
 
-		campaignFactory.createCampaignModel(campaignForm).ifPresent(campaign -> {
-			campaign.setOwner(getSessionCampaignManager());
-			saveCampaign(campaign, campaignForm);
-			LOG.info("Updated campaign with ID: " + campaign.getId() + " of type: " + campaign.getType() + " for user: " + campaign.getOwner().getId());
-		});
+		campaignBroadcastProducer.persistOperation(
+				new CampaignPersistenceOperation(campaignForm, PersistenceOperationType.UPDATE, sessionService.getSessionUser().getUsername()));
+		LOG.info("Successfully enqueued campaign modification for user with id: " + sessionService.getSessionUser().getId() +
+				 " and campaign with id: " + campaignForm.getId());
 	}
 
 	@Override
 	public void updateCampaignState(final Long id, final String state) {
-		final Predicate<Campaign> filterByOwner = campaign -> campaign.getOwner().getId().equals(sessionService.getSessionUser().getId());
-		final Campaign campaign = campaignRepository.findById(id).filter(filterByOwner).orElse(null);
-		if (campaign == null)
-			throw new UnknownIdentifierException("Campaign with id: \'" + id + "\' was not found for the session user");
+		final CampaignManager campaignManager = (CampaignManager) sessionService.getSessionUser();
+		if (campaignManager == null || campaignManager.getCampaigns() == null || campaignManager.getCampaigns().stream().map(Campaign::getId).noneMatch(id::equals))
+			throw new UnknownIdentifierException("The user in session has no campaign with id: " + id);
 
-		campaign.setState(CampaignState.valueOf(state.toUpperCase()));
-		if (campaign.getState() == CampaignState.ARCHIVED) {
-			if (LocalDate.now().isBefore(campaign.getStartDate()))
-				campaign.setStartDate(LocalDate.now());
-			campaign.setEndDate(LocalDate.now());
-		}
-		campaignManagerService.addOrUpdateCampaignForCampaignManager(campaign);
-		LOG.info("Created campaign state for campaign with ID: " + campaign.getId() + " of type: " + campaign.getType()
-				 + " for user: " + campaign.getOwner().getId() + " and with new state: " + campaign.getState());
+		campaignStateBroadcastProducer.enqueueCampaignStateUpdateOperation(
+				new CampaignStateUpdateOperation(sessionService.getSessionUser().getUsername(), id, state));
+		LOG.info("Successfully enqueued campaign state modification for user with id: " + sessionService.getSessionUser().getId() +
+				 " and campaign with id: " + id);
 	}
 
 	@Override
@@ -116,27 +102,6 @@ public abstract class DefaultCampaignService implements CampaignService {
 	public List<CampaignDTO> getAllCampaigns() {
 		return campaignRepository.findAll().stream().sorted(Comparator.comparing(Campaign::getStartDate))
 				.map(campaignDTOFactory::createCampaignDTO).collect(Collectors.toList());
-	}
-
-	/**
-	 * Saves the campaign image to the filesystem and associates it to the model if applicable, and saves the campaign
-	 * in the {@link CampaignRepository} as well as storing it in the campaign list of the {@link CampaignManager}
-	 * currently in session.
-	 *
-	 * @param campaign     Campaign model that will be persisted to the database
-	 * @param campaignForm Campaign form from which the model was created, which possibly contains the
-	 *                     {@link org.springframework.web.multipart.MultipartFile} that will be persisted to the file system
-	 */
-	private void saveCampaign(final Campaign campaign, final CampaignForm campaignForm) {
-		final String imagePath = fileSystemStorageService.saveImage(campaignForm.getCampaignImage());
-		Optional.ofNullable(imagePath).ifPresent(campaign::setCampaignImageFilePath);
-
-		campaignRepository.save(campaign);
-		campaignManagerService.addOrUpdateCampaignForCampaignManager(campaign);
-	}
-
-	private CampaignManager getSessionCampaignManager() {
-		return (CampaignManager) sessionService.getSessionUser();
 	}
 
 	public void setCampaignDTOFactory(CampaignDTOFactory campaignDTOFactory) {

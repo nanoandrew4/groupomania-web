@@ -1,8 +1,9 @@
 package com.greenapper.campaigns;
 
 import com.greenapper.Application;
+import com.greenapper.config.MessageBrokerConfig;
 import com.greenapper.controllers.campaign.DefaultCampaignController;
-import com.greenapper.dtos.campaign.CampaignDTO;
+import com.greenapper.dtos.campaigns.CampaignDTO;
 import com.greenapper.enums.CampaignState;
 import com.greenapper.exceptions.UnknownIdentifierException;
 import com.greenapper.models.CampaignManager;
@@ -42,6 +43,9 @@ public class DefaultCampaignIntegrationTest {
 
 	@Autowired
 	private DefaultCampaignController defaultCampaignController;
+
+	@Autowired
+	private MessageBrokerConfig messageBrokerConfig;
 
 	@Before
 	public void setup() {
@@ -94,14 +98,16 @@ public class DefaultCampaignIntegrationTest {
 
 	@Test
 	public void updateCampaignStatusAsOwner() {
-		setup();
 		final List<Campaign> userCampaigns = ((CampaignManager) sessionService.getSessionUser()).getCampaigns();
 		final Predicate<Campaign> filterById = campaign -> 1L == campaign.getId();
 		final CampaignState initState = userCampaigns.stream().filter(filterById).findFirst().map(Campaign::getState).orElse(null);
 
 		defaultCampaignController.updateCampaignState(1L, "archived");
 
-		final CampaignState finalState = userCampaigns.stream().filter(filterById).findFirst().map(Campaign::getState).orElse(null);
+		messageBrokerConfig.sleepWhileOperationsPending(messageBrokerConfig.campaignStateQueue());
+		sessionService.setSessionUser(campaignManagerService.getByUsername("admin").orElse(null));
+
+		final CampaignState finalState = ((CampaignManager) sessionService.getSessionUser()).getCampaigns().stream().filter(filterById).findFirst().map(Campaign::getState).orElse(null);
 		assertNotEquals(initState, finalState);
 		assertEquals(CampaignState.ACTIVE, initState);
 		assertEquals(CampaignState.ARCHIVED, finalState);

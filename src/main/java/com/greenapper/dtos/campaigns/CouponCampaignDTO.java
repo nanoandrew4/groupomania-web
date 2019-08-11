@@ -1,7 +1,6 @@
-package com.greenapper.dtos.campaign;
+package com.greenapper.dtos.campaigns;
 
 import com.greenapper.enums.CampaignType;
-import com.greenapper.forms.campaigns.CouponCampaignForm;
 import com.greenapper.models.campaigns.CouponCampaign;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -32,7 +31,7 @@ public class CouponCampaignDTO extends CampaignDTO {
 	}
 
 	/**
-	 * Creates a {@link CouponCampaignForm} with the data from the supplied {@link CouponCampaign}.
+	 * Creates a {@link com.greenapper.dtos.campaigns.CouponCampaignDTO} with the data from the supplied {@link CouponCampaign}.
 	 *
 	 * @param couponCampaign Campaign model from which to copy the data
 	 */

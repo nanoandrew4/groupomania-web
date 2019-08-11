@@ -1,6 +1,6 @@
 package com.greenapper.services;
 
-import com.greenapper.dtos.campaign.CampaignDTO;
+import com.greenapper.dtos.campaigns.CampaignDTO;
 import com.greenapper.enums.CampaignState;
 import com.greenapper.enums.CampaignType;
 import com.greenapper.exceptions.UnknownIdentifierException;
@@ -73,7 +73,8 @@ public class DefaultCampaignServiceUnitTest {
 
 		when(campaignRepository.findById(anyLong())).thenReturn(campaign);
 
-		final CampaignDTO campaignDTO = campaignService.getCampaignById(1L);
+		final CampaignDTO campaignDTO;
+		campaignDTO = campaignService.getCampaignById(1L);
 
 		assertNotNull(campaignDTO);
 		assertEquals(1L, campaignDTO.getId().longValue());

@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(description = "Represents a campaign object, this form is extended from so that the campaign subclasses can implemented their own forms",
 		  subTypes = {OfferCampaignForm.class, CouponCampaignForm.class})
+//@JsonDeserialize(using = CampaignFormDeserializer.class)
 public class CampaignForm {
 	@ApiModelProperty(value = "Campaign identifier", notes = "Is unique across all campaigns", required = true)
 	private Long id;

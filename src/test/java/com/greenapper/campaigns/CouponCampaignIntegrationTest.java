@@ -1,6 +1,7 @@
 package com.greenapper.campaigns;
 
 import com.greenapper.Application;
+import com.greenapper.config.MessageBrokerConfig;
 import com.greenapper.controllers.campaign.CouponCampaignController;
 import com.greenapper.enums.CampaignState;
 import com.greenapper.exceptions.ValidationException;
@@ -55,6 +56,9 @@ public class CouponCampaignIntegrationTest {
 
 	@Autowired
 	private CampaignFormFactory campaignFormFactory;
+
+	@Autowired
+	private MessageBrokerConfig messageBrokerConfig;
 
 	@Before
 	public void setup() {
@@ -356,9 +360,11 @@ public class CouponCampaignIntegrationTest {
 
 		couponCampaignController.createCampaign(campaignForm, errors);
 
+		messageBrokerConfig.sleepWhileOperationsPending(messageBrokerConfig.campaignQueue());
+
 		assertFalse(errors.hasErrors());
 		assertFalse(((CampaignManager) sessionService.getSessionUser()).getCampaigns().isEmpty());
-		assertEquals(initCampaignCount + 1, ((CampaignManager) sessionService.getSessionUser()).getCampaigns().size());
+		assertEquals(initCampaignCount + 1, campaignManagerService.getByUsername("admin").map(CampaignManager::getCampaigns).map(List::size).get().longValue());
 	}
 
 	@Test
@@ -378,6 +384,9 @@ public class CouponCampaignIntegrationTest {
 		campaignForm.setCouponEndDate(campaignForm.getEndDate());
 
 		couponCampaignController.updateCampaign(campaignForm, errors);
+
+		messageBrokerConfig.sleepWhileOperationsPending(messageBrokerConfig.campaignQueue());
+		sessionService.setSessionUser(campaignManagerService.getByUsername("admin").orElse(null));
 
 		final CouponCampaignForm updatedForm = getCampaignFormToUpdate();
 

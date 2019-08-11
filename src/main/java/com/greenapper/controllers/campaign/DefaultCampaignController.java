@@ -1,7 +1,7 @@
 package com.greenapper.controllers.campaign;
 
 import com.greenapper.dtos.ErrorDTO;
-import com.greenapper.dtos.campaign.CampaignDTO;
+import com.greenapper.dtos.campaigns.CampaignDTO;
 import com.greenapper.enums.CampaignState;
 import com.greenapper.services.CampaignService;
 import com.greenapper.services.impl.campaigns.DefaultCampaignService;

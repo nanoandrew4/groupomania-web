@@ -101,6 +101,7 @@ public class CampaignManagerIntegrationTest {
 	@Test
 	@DirtiesContext
 	public void updatePasswordSuccessfully() {
+		final String oldPassword = sessionService.getSessionUser().getPassword();
 		final PasswordUpdateForm passwordUpdateForm = new PasswordUpdateForm();
 		final Errors errors = new BeanPropertyBindingResult(passwordUpdateForm, "passwordUpdateForm");
 		passwordUpdateForm.setOldPassword("testing");
@@ -110,5 +111,6 @@ public class CampaignManagerIntegrationTest {
 		campaignManagerController.updatePassword(passwordUpdateForm, errors);
 
 		assertFalse(errors.hasErrors());
+		assertNotEquals(oldPassword, campaignManagerService.getByUsername("admin").map(CampaignManager::getPassword));
 	}
 }

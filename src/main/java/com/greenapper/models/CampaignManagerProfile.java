@@ -1,6 +1,7 @@
 package com.greenapper.models;
 
 import com.greenapper.forms.CampaignManagerProfileForm;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.Optional;
@@ -16,6 +17,7 @@ public class CampaignManagerProfile {
 
 	@OneToOne(fetch = FetchType.LAZY)
 	@MapsId
+	@JsonIgnore
 	private CampaignManager campaignManager;
 
 	private String name;
@@ -30,7 +32,7 @@ public class CampaignManagerProfile {
 		Optional.ofNullable(profileForm.getCampaignManager()).ifPresent(this::setCampaignManager);
 		Optional.ofNullable(profileForm.getName()).ifPresent(this::setName);
 		Optional.ofNullable(profileForm.getEmail()).ifPresent(this::setEmail);
-		Optional.ofNullable(profileForm.getEmail()).ifPresent(this::setAddress);
+		Optional.ofNullable(profileForm.getAddress()).ifPresent(this::setAddress);
 	}
 
 	public Long getId() {

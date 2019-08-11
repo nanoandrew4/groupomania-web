@@ -1,4 +1,4 @@
-package com.greenapper.dtos.campaign;
+package com.greenapper.dtos.campaigns;
 
 import com.greenapper.enums.CampaignState;
 import com.greenapper.enums.CampaignType;
