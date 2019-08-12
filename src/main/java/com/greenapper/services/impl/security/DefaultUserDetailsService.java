@@ -1,10 +1,9 @@
 package com.greenapper.services.impl.security;
 
+import com.greenapper.logging.LogManager;
 import com.greenapper.models.Authority;
 import com.greenapper.models.User;
 import com.greenapper.services.CampaignManagerService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -22,7 +21,8 @@ public class DefaultUserDetailsService implements UserDetailsService {
 	@Autowired
 	private CampaignManagerService campaignManagerService;
 
-	private Logger LOG = LoggerFactory.getLogger(DefaultUserDetailsService.class);
+	@Autowired
+	private LogManager LOG;
 
 	@Override
 	public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {

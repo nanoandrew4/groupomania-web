@@ -4,11 +4,11 @@ import com.greenapper.factories.campaign.CampaignFactory;
 import com.greenapper.forms.campaigns.CampaignForm;
 import com.greenapper.forms.campaigns.CouponCampaignForm;
 import com.greenapper.forms.campaigns.OfferCampaignForm;
+import com.greenapper.logging.LogManager;
 import com.greenapper.models.campaigns.Campaign;
 import com.greenapper.models.campaigns.CouponCampaign;
 import com.greenapper.models.campaigns.OfferCampaign;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -16,7 +16,8 @@ import java.util.Optional;
 @Component
 public class DefaultCampaignFactory implements CampaignFactory {
 
-	private Logger LOG = LoggerFactory.getLogger(DefaultCampaignFactory.class);
+	@Autowired
+	private LogManager LOG;
 
 	@Override
 	public Optional<Campaign> createCampaignModel(final CampaignForm campaignForm) {

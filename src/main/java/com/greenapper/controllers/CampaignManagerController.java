@@ -4,11 +4,10 @@ import com.greenapper.dtos.OAuthExceptionDTO;
 import com.greenapper.dtos.ValidationErrorDTO;
 import com.greenapper.dtos.campaigns.CampaignDTO;
 import com.greenapper.forms.PasswordUpdateForm;
+import com.greenapper.logging.LogManager;
 import com.greenapper.models.CampaignManager;
 import com.greenapper.services.CampaignManagerService;
 import io.swagger.annotations.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
@@ -33,7 +32,8 @@ public class CampaignManagerController {
 
 	public final static String CAMPAIGNS_OVERVIEW_URI = ROOT_URI + "/campaigns";
 
-	private Logger LOG = LoggerFactory.getLogger(CampaignManagerController.class);
+	@Autowired
+	private LogManager LOG;
 
 	@Autowired
 	private CampaignManagerService campaignManagerService;

@@ -3,8 +3,7 @@ package com.greenapper.handlers;
 import com.greenapper.dtos.ErrorDTO;
 import com.greenapper.dtos.ValidationErrorDTO;
 import com.greenapper.exceptions.ValidationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.greenapper.logging.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -27,7 +26,8 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-	private Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+	@Autowired
+	private LogManager LOG;
 
 	@Autowired
 	private MessageSource messageSource;

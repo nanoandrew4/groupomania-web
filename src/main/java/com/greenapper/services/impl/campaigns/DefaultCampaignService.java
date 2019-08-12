@@ -5,6 +5,7 @@ import com.greenapper.exceptions.UnknownIdentifierException;
 import com.greenapper.exceptions.ValidationException;
 import com.greenapper.factories.campaign.CampaignDTOFactory;
 import com.greenapper.forms.campaigns.CampaignForm;
+import com.greenapper.logging.LogManager;
 import com.greenapper.models.CampaignManager;
 import com.greenapper.models.campaigns.Campaign;
 import com.greenapper.queues.PersistenceOperationType;
@@ -15,8 +16,6 @@ import com.greenapper.queues.campaign.persist.state.CampaignStateUpdateOperation
 import com.greenapper.repositories.CampaignRepository;
 import com.greenapper.services.CampaignService;
 import com.greenapper.services.SessionService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.Errors;
 
@@ -42,7 +41,8 @@ public abstract class DefaultCampaignService implements CampaignService {
 	@Autowired
 	private CampaignStateBroadcastProducer campaignStateBroadcastProducer;
 
-	private Logger LOG = LoggerFactory.getLogger(this.getClass());
+	@Autowired
+	private LogManager LOG;
 
 	@Override
 	public void createCampaign(final CampaignForm campaignForm, final Errors errors) {

@@ -4,17 +4,18 @@ import com.greenapper.dtos.campaigns.CampaignDTO;
 import com.greenapper.dtos.campaigns.CouponCampaignDTO;
 import com.greenapper.dtos.campaigns.OfferCampaignDTO;
 import com.greenapper.factories.campaign.CampaignDTOFactory;
+import com.greenapper.logging.LogManager;
 import com.greenapper.models.campaigns.Campaign;
 import com.greenapper.models.campaigns.CouponCampaign;
 import com.greenapper.models.campaigns.OfferCampaign;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DefaultCampaignDTOFactory implements CampaignDTOFactory {
 
-	private Logger LOG = LoggerFactory.getLogger(DefaultCampaignDTOFactory.class);
+	@Autowired
+	private LogManager LOG;
 
 	@Override
 	public CampaignDTO createCampaignDTO(final Campaign campaign) {

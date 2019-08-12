@@ -3,11 +3,9 @@ package com.greenapper.controllers.campaign;
 import com.greenapper.dtos.ErrorDTO;
 import com.greenapper.dtos.campaigns.CampaignDTO;
 import com.greenapper.enums.CampaignState;
+import com.greenapper.logging.LogManager;
 import com.greenapper.services.CampaignService;
-import com.greenapper.services.impl.campaigns.DefaultCampaignService;
 import io.swagger.annotations.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
@@ -25,7 +23,8 @@ public class DefaultCampaignController {
 	@Autowired
 	private CampaignService campaignService;
 
-	private Logger LOG = LoggerFactory.getLogger(DefaultCampaignService.class);
+	@Autowired
+	private LogManager LOG;
 
 	/**
 	 * Retrieves a campaign by ID, and sets a flag to indicate to the frontend that the accompanying form should be

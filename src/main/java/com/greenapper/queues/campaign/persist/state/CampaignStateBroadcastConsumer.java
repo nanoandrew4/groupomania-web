@@ -2,12 +2,11 @@ package com.greenapper.queues.campaign.persist.state;
 
 import com.greenapper.enums.CampaignState;
 import com.greenapper.exceptions.UnknownIdentifierException;
+import com.greenapper.logging.LogManager;
 import com.greenapper.models.CampaignManager;
 import com.greenapper.models.campaigns.Campaign;
 import com.greenapper.repositories.CampaignRepository;
 import com.greenapper.services.CampaignManagerService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,7 +23,8 @@ public class CampaignStateBroadcastConsumer {
 	@Autowired
 	private CampaignManagerService campaignManagerService;
 
-	private Logger LOG = LoggerFactory.getLogger(CampaignStateBroadcastConsumer.class);
+	@Autowired
+	private LogManager LOG;
 
 	@RabbitListener(queues = {"${groupomania.rabbitmq.campaign.state.queue.name}"})
 	public void updateCampaignState(final CampaignStateUpdateOperation campaignStateUpdateOperation) {

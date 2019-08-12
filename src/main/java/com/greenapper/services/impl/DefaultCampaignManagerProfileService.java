@@ -4,13 +4,12 @@ import com.greenapper.dtos.CampaignManagerProfileDTO;
 import com.greenapper.exceptions.NotFoundException;
 import com.greenapper.exceptions.ValidationException;
 import com.greenapper.forms.CampaignManagerProfileForm;
+import com.greenapper.logging.LogManager;
 import com.greenapper.queues.campaignmanager.profile.ProfileUpdateBroadcastProducer;
 import com.greenapper.queues.campaignmanager.profile.ProfileUpdateOperation;
 import com.greenapper.repositories.CampaignManagerProfileRepository;
 import com.greenapper.services.CampaignManagerProfileService;
 import com.greenapper.services.SessionService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
@@ -33,7 +32,8 @@ public class DefaultCampaignManagerProfileService implements CampaignManagerProf
 	@Autowired
 	private ProfileUpdateBroadcastProducer profileUpdateBroadcastProducer;
 
-	private Logger LOG = LoggerFactory.getLogger(this.getClass());
+	@Autowired
+	private LogManager LOG;
 
 	@Override
 	public CampaignManagerProfileDTO getProfileForCurrentUser() {
