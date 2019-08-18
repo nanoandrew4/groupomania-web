@@ -4,14 +4,13 @@ import com.greenapper.enums.CampaignState;
 import com.greenapper.exceptions.UnknownIdentifierException;
 import com.greenapper.factories.campaign.CampaignFactory;
 import com.greenapper.forms.campaigns.CampaignForm;
+import com.greenapper.logging.LogManager;
 import com.greenapper.models.CampaignManager;
 import com.greenapper.models.campaigns.Campaign;
 import com.greenapper.queues.PersistenceOperationType;
 import com.greenapper.repositories.CampaignRepository;
 import com.greenapper.services.CampaignManagerService;
 import com.greenapper.services.FileSystemStorageService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -33,7 +32,8 @@ public class CampaignBroadcastConsumer {
 	@Autowired
 	private CampaignFactory campaignFactory;
 
-	private Logger LOG = LoggerFactory.getLogger(CampaignBroadcastConsumer.class);
+	@Autowired
+	private LogManager LOG;
 
 	@RabbitListener(queues = {"${groupomania.rabbitmq.campaign.queue.name}"})
 	public void receivePersistCampaignOperation(final CampaignPersistenceOperation campaignPersistenceOperation) {

@@ -4,6 +4,7 @@ import com.greenapper.dtos.campaigns.CampaignDTO;
 import com.greenapper.exceptions.ValidationException;
 import com.greenapper.factories.campaign.CampaignDTOFactory;
 import com.greenapper.forms.PasswordUpdateForm;
+import com.greenapper.logging.LogManager;
 import com.greenapper.models.CampaignManager;
 import com.greenapper.models.campaigns.Campaign;
 import com.greenapper.queues.campaignmanager.password.PasswordUpdateBroadcastProducer;
@@ -11,8 +12,6 @@ import com.greenapper.queues.campaignmanager.password.PasswordUpdateOperation;
 import com.greenapper.repositories.CampaignManagerRepository;
 import com.greenapper.services.CampaignManagerService;
 import com.greenapper.services.SessionService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
@@ -42,7 +41,8 @@ public class DefaultCampaignManagerService implements CampaignManagerService {
 	@Autowired
 	private PasswordUpdateBroadcastProducer passwordUpdateBroadcastProducer;
 
-	private Logger LOG = LoggerFactory.getLogger(this.getClass());
+	@Autowired
+	private LogManager LOG;
 
 	@Override
 	public Optional<CampaignManager> getByUsername(final String username) {

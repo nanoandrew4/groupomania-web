@@ -2,9 +2,9 @@ package com.greenapper.services.impl;
 
 import com.greenapper.exceptions.UnknownIdentifierException;
 import com.greenapper.forms.ImageForm;
+import com.greenapper.logging.LogManager;
 import com.greenapper.services.FileSystemStorageService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +29,8 @@ public class DefaultFileSystemStorageService implements FileSystemStorageService
 
 	private MessageDigest md;
 
-	private Logger LOG = LoggerFactory.getLogger(this.getClass());
+	@Autowired
+	private LogManager LOG;
 
 	/**
 	 * Initializes the {@link MessageDigest} instance that will be used for hashing usernames and filenames for secure

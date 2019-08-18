@@ -1,12 +1,11 @@
 package com.greenapper.queues.campaignmanager.profile;
 
+import com.greenapper.logging.LogManager;
 import com.greenapper.models.CampaignManager;
 import com.greenapper.models.CampaignManagerProfile;
 import com.greenapper.repositories.CampaignManagerProfileRepository;
 import com.greenapper.repositories.CampaignManagerRepository;
 import com.greenapper.services.FileSystemStorageService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,7 +24,8 @@ public class ProfileUpdateBroadcastConsumer {
 	@Autowired
 	private CampaignManagerProfileRepository campaignManagerProfileRepository;
 
-	private Logger LOG = LoggerFactory.getLogger(this.getClass());
+	@Autowired
+	private LogManager LOG;
 
 	@RabbitListener(queues = {"${groupomania.rabbitmq.user.campaignmanager.profile.queue.name}"})
 	public void updateProfile(final ProfileUpdateOperation profileUpdateOperation) {

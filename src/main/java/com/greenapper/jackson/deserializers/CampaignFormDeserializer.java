@@ -10,8 +10,8 @@ import com.greenapper.forms.ImageForm;
 import com.greenapper.forms.campaigns.CampaignForm;
 import com.greenapper.forms.campaigns.CouponCampaignForm;
 import com.greenapper.forms.campaigns.OfferCampaignForm;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.greenapper.logging.LogManager;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -22,7 +22,8 @@ import java.util.Optional;
  */
 public class CampaignFormDeserializer extends StdDeserializer<CampaignForm> {
 
-	private Logger LOG = LoggerFactory.getLogger(CampaignFormDeserializer.class);
+	@Autowired
+	private LogManager LOG;
 
 	public CampaignFormDeserializer() {
 		super(CampaignForm.class);
