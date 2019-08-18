@@ -13,16 +13,26 @@ import java.util.Map;
 
 @Component
 public class LogManager {
+
 	@Autowired
 	private MongoTemplate mongoTemplate;
 
 	private static Map<String, Logger> loggerMap = new HashMap<>();
 
+	/**
+	 * Determines the class that requested logging, to return a logger for the caller class, which will be created
+	 * if it does not exist.
+	 *
+	 * @return {@link Logger} for the caller class
+	 */
 	private Logger getCallerClassLogger() {
 		final StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 		String caller = null;
+		boolean recordCaller = false;
 		for (StackTraceElement stackTraceElement : stackTrace) {
-			if (!stackTraceElement.getClassName().equals(this.getClass().getName())) {
+			if (this.getClass().getName().equals(stackTraceElement.getClassName()))
+				recordCaller = true;
+			if (recordCaller && !stackTraceElement.getClassName().equals(this.getClass().getName())) {
 				caller = stackTraceElement.getClassName();
 				break;
 			}
@@ -31,10 +41,9 @@ public class LogManager {
 		if (caller == null)
 			throw new NotFoundException("Caller method not found, no logger can be returned");
 
-		final Logger targetLogger = loggerMap.get(caller);
-		if (targetLogger == null)
-			return loggerMap.put(caller, LoggerFactory.getLogger(caller));
-		return targetLogger;
+		if (!loggerMap.containsKey(caller))
+			loggerMap.put(caller, LoggerFactory.getLogger(caller));
+		return loggerMap.get(caller);
 	}
 
 	public void info(final String message) {

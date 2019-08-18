@@ -8,7 +8,7 @@ RUN addgroup -S groupomania-admin && adduser -S groupomania-admin -G groupomania
 
 USER groupomania-admin
 
-ENV JAVA_OPTS="-Dspring.datasource.url=jdbc:postgresql://postgres:5432/groupomania?currentSchema=groupomania_schema -Dspring.rabbitmq.host=rabbitmq"
+ENV JAVA_OPTS="-Dspring.datasource.url=jdbc:postgresql://postgres:5432/groupomania?currentSchema=groupomania_schema -Dspring.rabbitmq.host=rabbitmq -Dspring.data.mongodb.host=mongodb"
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app.jar"]
 
 HEALTHCHECK --interval=1m --timeout=10s --retries=3 CMD curl --fail https://127.0.0.1:8443/ || exit 1

@@ -21,7 +21,6 @@ services:
       - /tmp
       - /run
       - /run/postgresql
-
   rabbitmq:
     image: rabbitmq:3-management
     ports:
@@ -38,5 +37,3 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=greenapperadmin
       - MONGO_INITDB_ROOT_PASSWORD=supersecretpassword
       - MONGO_INITDB_DATABASE=loggingdb
-    volumes:
-      - ./mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
