@@ -66,6 +66,8 @@ public class DefaultCampaignController {
 		final List<CampaignDTO> campaigns = campaignService.getAllCampaigns();
 		campaigns.removeIf(this::isCampaignUnlisted);
 
+		LOG.info("Returning publicly available campaigns");
+
 		return campaigns;
 	}
 

@@ -48,21 +48,21 @@ public class LogManager {
 
 	public void info(final String message) {
 		getCallerClassLogger().info(message);
-		mongoTemplate.insert(new LogMessage(message, "INFO"));
+		mongoTemplate.insert(new LogMessage(message, "INFO"), "logs");
 	}
 
 	public void warn(final String message) {
 		getCallerClassLogger().warn(message);
-		mongoTemplate.insert(new LogMessage(message, "WARN"));
+		mongoTemplate.insert(new LogMessage(message, "WARN"), "logs");
 	}
 
 	public void error(final String message) {
 		getCallerClassLogger().error(message);
-		mongoTemplate.insert(new LogMessage(message, "ERROR"));
+		mongoTemplate.insert(new LogMessage(message, "ERROR"), "logs");
 	}
 
 	public void error(final String message, final Throwable t) {
 		getCallerClassLogger().error(message, t);
-		mongoTemplate.insert(new LogMessage(message, t, "ERROR"));
+		mongoTemplate.insert(new LogMessage(message, t, "ERROR"), "logs");
 	}
 }
