@@ -1,0 +1,68 @@
+version: '2.2'
+
+services:
+  # Mongo replica set nodes (using 3)
+  mongorsn1:
+    build: shard
+    command: mongod --shardsvr --replSet mongors1 --keyFile /tmp/mongodb-keyfile --dbpath /data/db --port 27017
+    ports:
+      - "127.0.0.1:27018:27017"
+    volumes:
+      - /mongo_cluster/data1:/data/db
+    networks:
+      - backend
+  mongorsn2:
+    build: shard
+    command: mongod --shardsvr --replSet mongors1 --keyFile /tmp/mongodb-keyfile --dbpath /data/db --port 27017
+    ports:
+      - "127.0.0.1:27019:27017"
+    volumes:
+      - /mongo_cluster/data2:/data/db
+    networks:
+      - backend
+  mongorsn3:
+    build: shard
+    command: mongod --shardsvr --replSet mongors1 --keyFile /tmp/mongodb-keyfile --dbpath /data/db --port 27017
+    ports:
+      - "127.0.0.1:27020:27017"
+    volumes:
+      - /mongo_cluster/data3:/data/db
+    networks:
+      - backend
+  # 2 Mongo config servers
+  mongo-cfg1:
+    build: config
+    command: mongod --configsvr --replSet mongors1conf --keyFile /tmp/mongodb-keyfile --dbpath /data/db --port 27017
+    volumes:
+      - /mongo_cluster/config1:/data/db
+    networks:
+      - backend
+  mongo-cfg2:
+    build: config
+    command: mongod --configsvr --replSet mongors1conf --keyFile /tmp/mongodb-keyfile --dbpath /data/db --port 27017
+    volumes:
+      - /mongo_cluster/config2:/data/db
+    networks:
+      - backend
+  mongo-cfg3:
+    build: config
+    command: mongod --configsvr --replSet mongors1conf --keyFile /tmp/mongodb-keyfile --dbpath /data/db --port 27017
+    volumes:
+      - /mongo_cluster/config3:/data/db
+    networks:
+      - backend
+  # Mongo router
+  mongo-router:
+    build: router
+    depends_on:
+      - mongo-cfg1
+      - mongo-cfg2
+    command: mongos --bind_ip 127.0.0.1 --keyFile /tmp/mongodb-keyfile --configdb mongors1conf/mongo-cfg1:27017,mongo-cfg2:27017,mongo-cfg3:27017 --port 27017
+    ports:
+      - "127.0.0.1:27017:27017"
+    networks:
+      - backend
+
+networks:
+  backend:
+    external: true

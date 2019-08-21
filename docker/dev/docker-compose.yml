@@ -29,45 +29,11 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=greenapperadmin
       - RABBITMQ_DEFAULT_PASS=supersecretpassword
-  # Mongo replica set nodes (using 3)
-  mongorsn1:
-    build: mongo/shard
-    command: mongod --shardsvr --replSet mongors1 --keyFile /tmp/mongodb-keyfile --dbpath /data/db --port 27017
+  mongodb:
+    image: mongo
     ports:
-      - 27017:27017
-    volumes:
-      - /mongo_cluster/data1:/data/db
-  mongors1n2:
-    build: mongo/shard
-    command: mongod --shardsvr --replSet mongors1 --keyFile /tmp/mongodb-keyfile --dbpath /data/db --port 27017
-    ports:
-      - 27018:27017
-    volumes:
-      - /mongo_cluster/data2:/data/db
-  mongors1n3:
-    build: mongo/shard
-    command: mongod --shardsvr --replSet mongors1 --keyFile /tmp/mongodb-keyfile --dbpath /data/db --port 27017
-    ports:
-      - 27019:27017
-    volumes:
-      - /mongo_cluster/data3:/data/db
-  # 2 Mongo config servers
-  mongocfg1:
-    build: mongo/config
-    command: mongod --configsvr --replSet mongors1conf --keyFile /tmp/mongodb-keyfile --dbpath /data/db --port 27017
-    volumes:
-      - /mongo_cluster/config1:/data/db
-  mongocfg2:
-    build: mongo/config
-    command: mongod --configsvr --replSet mongors1conf --keyFile /tmp/mongodb-keyfile --dbpath /data/db --port 27017
-    volumes:
-      - /mongo_cluster/config2:/data/db
-  # Mongo router
-  mongos1:
-    build: mongo/router
-    depends_on:
-      - mongocfg1
-      - mongocfg2
-    command: mongos --keyFile /tmp/mongodb-keyfile --configdb mongors1conf/mongocfg1:27017,mongocfg2:27017 --port 27017
-    ports:
-      - 27020:27017
+      - "127.0.0.1:27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=greenapperadmin
+      - MONGO_INITDB_ROOT_PASSWORD=supersecretpassword
+      - MONGO_INITDB_DATABASE=loggingdb
