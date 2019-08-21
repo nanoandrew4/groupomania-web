@@ -1,7 +1,7 @@
 version: '2.2'
 
 services:
-  # Mongo replica set nodes (using 3)
+  # Mongo replica sets (2) with 2 mongod instances each
   mongorsn1:
     build: shard
     command: mongod --shardsvr --replSet mongors1 --keyFile /tmp/mongodb-keyfile --dbpath /data/db --port 27017
@@ -22,29 +22,38 @@ services:
       - backend
   mongorsn3:
     build: shard
-    command: mongod --shardsvr --replSet mongors1 --keyFile /tmp/mongodb-keyfile --dbpath /data/db --port 27017
+    command: mongod --shardsvr --replSet mongors2 --keyFile /tmp/mongodb-keyfile --dbpath /data/db --port 27017
     ports:
       - "127.0.0.1:27020:27017"
     volumes:
       - /mongo_cluster/data3:/data/db
     networks:
       - backend
+  mongorsn4:
+    build: shard
+    command: mongod --shardsvr --replSet mongors2 --keyFile /tmp/mongodb-keyfile --dbpath /data/db --port 27017
+    ports:
+      - "127.0.0.1:27021:27017"
+    volumes:
+      - /mongo_cluster/data4:/data/db
+    networks:
+      - backend
   # 2 Mongo config servers
-  mongo-cfg1:
+  mongocfg1:
     build: config
     command: mongod --configsvr --replSet mongors1conf --keyFile /tmp/mongodb-keyfile --dbpath /data/db --port 27017
     volumes:
       - /mongo_cluster/config1:/data/db
     networks:
       - backend
-  mongo-cfg2:
+  mongocfg2:
     build: config
     command: mongod --configsvr --replSet mongors1conf --keyFile /tmp/mongodb-keyfile --dbpath /data/db --port 27017
     volumes:
       - /mongo_cluster/config2:/data/db
     networks:
       - backend
-  mongo-cfg3:
+  mongocfg3:
     build: config
     command: mongod --configsvr --replSet mongors1conf --keyFile /tmp/mongodb-keyfile --dbpath /data/db --port 27017
     volumes:
@@ -52,12 +61,13 @@ services:
     networks:
       - backend
   # Mongo router
-  mongo-router:
+  mongorouter:
     build: router
     depends_on:
-      - mongo-cfg1
-      - mongo-cfg2
-    command: mongos --bind_ip 127.0.0.1 --keyFile /tmp/mongodb-keyfile --configdb mongors1conf/mongo-cfg1:27017,mongo-cfg2:27017,mongo-cfg3:27017 --port 27017
+      - mongocfg1
+      - mongocfg2
+      - mongocfg3
+    command: mongos --keyFile /tmp/mongodb-keyfile --configdb mongors1conf/mongocfg1:27017,mongocfg2:27017,mongocfg3:27017 --bind_ip_all --port 27017
     ports:
       - "127.0.0.1:27017:27017"
     networks:

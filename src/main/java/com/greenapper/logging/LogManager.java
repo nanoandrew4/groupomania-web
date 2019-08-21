@@ -56,6 +56,11 @@ public class LogManager {
 		mongoTemplate.insert(new LogMessage(message, "WARN"), "logs");
 	}
 
+	public void warn(final String message, final Throwable t) {
+		getCallerClassLogger().warn(message);
+		mongoTemplate.insert(new LogMessage(message, t, "WARN"), "logs");
+	}
+
 	public void error(final String message) {
 		getCallerClassLogger().error(message);
 		mongoTemplate.insert(new LogMessage(message, "ERROR"), "logs");
