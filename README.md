@@ -8,22 +8,30 @@
 - Run the build script for the environment you want to start (either dev or prod)
 
 #### Running the development instance of the backend
-The development instance simply starts creates a database container for 
-the server to store the data in, and starts the server on the host machine 
-(not in a container). This database is also loaded with a script containing 
+The development instance simply starts creates a PostgreSQL database container for 
+the server to store the data in, a RabbitMQ container to use as a message broker, 
+a MongoDB container to use for log storage, and starts the server on the host machine 
+(not in a container). The PostgreSQL database is also loaded with a script containing 
 sample data, located at 'src/main/resources/data-postgres.sql'. 
 Starting the server on the local host and not in a container allows for
 shorter start times, and remote debugging, which are two important 
 elements to consider when developing locally.
 
 #### Running a production ready instance of the backend
-The startup process is as follows: the database container is started, the server 
-container is started, and once both are live, a script containing sample data is 
-loaded into the database. The script is located at 'src/main/resources/data-postgres.sql'
+The startup process is as follows: First the MongoDB sharded + replicated cluster
+is started. Three configuration servers are used, one router, and four nodes, divided into
+to replica sets, which form the two shards used by the cluster. Once the MongoDB cluster 
+containers are active, a configuration script is run to set them all up 
+(the script is 'script/setupProdMongoShards.sh'). Then
+the PostgreSQL database container is started, the RabbitMQ
+container is started, and the server container is started, and once both 
+the PostgreSQL and server containers are live, a script containing sample data 
+is loaded into the database. The script is located at 'src/main/resources/data-postgres.sql'
 
 To stop the production setup, change directories to the root of the project, and then `docker/prod`.
 Once here, run `docker-compose stop` in order to stop the containers, so they can later be restarted
-with `docker-compose start`. To stop and delete the containers, run `docker-compose down`.
+with `docker-compose start`. Also make sure to run the stop command in the 'docker/prod/mongo'
+directory. To stop and delete the containers, run the script called 'stopProdServerAndDeleteContainers.sh'.
 
 ## Container security hardening
 
