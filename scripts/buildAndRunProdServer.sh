@@ -4,7 +4,19 @@
 
 cd ..
 mvn clean package docker:build -Denvironment=production
-cd docker/prod/
+
+docker network create backend
+
+cd docker/prod/mongo
+echo "Setting up sharded MongoDB cluster..."
+docker-compose build
+docker-compose up -d
+sleep 10
+echo "Running cluster configuration script..."
+../../../scripts/setupProdMongoShards.sh
+
+echo "Starting remaining backend containers..."
+cd ../
 docker-compose build
 docker-compose up -d
 
@@ -23,4 +35,5 @@ cd ../../scripts/
 ./importSampleData.sh
 
 echo "Data imported successfully"
+
 echo "Server is now ready to accept request"

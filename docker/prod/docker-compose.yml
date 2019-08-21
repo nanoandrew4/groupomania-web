@@ -21,6 +21,8 @@ services:
       - /tmp
       - /run
       - /run/postgresql
+    networks:
+      - backend
   rabbitmq:
     image: rabbitmq:3-management
     ports:
@@ -29,20 +31,10 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=greenapperadmin
       - RABBITMQ_DEFAULT_PASS=supersecretpassword
-  mongodb:
-    image: mongo
-    ports:
-      - "127.0.0.1:27017:27017"
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=greenapperadmin
-      - MONGO_INITDB_ROOT_PASSWORD=supersecretpassword
-      - MONGO_INITDB_DATABASE=loggingdb
+    networks:
+      - backend
   groupomania:
     image: groupomania:latest
-    links:
-      - postgres
-      - mongodb
-      - rabbitmq
     ports:
       - "127.0.0.1:8444:8444"
     depends_on:
@@ -53,3 +45,9 @@ services:
     cpu_shares: 500
     pids_limit: 64
     read_only: true
+    networks:
+      - backend
+
+networks:
+  backend:
+    external: true

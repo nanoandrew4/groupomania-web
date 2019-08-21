@@ -36,6 +36,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler(RuntimeException.class)
 	public ResponseEntity handle(final RuntimeException ex) {
+		LOG.warn("Attempting to handle exception: ", ex);
+
 		HttpStatus responseStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		try {
 			if (ex instanceof AccessDeniedException)
