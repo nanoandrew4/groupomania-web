@@ -30,7 +30,7 @@ is loaded into the database. The script is located at 'src/main/resources/data-p
 
 To stop the production setup, change directories to the root of the project, and then `docker/prod`.
 Once here, run `docker-compose stop` in order to stop the containers, so they can later be restarted
-with `docker-compose start`. Also make sure to run the stop command in the 'docker/prod/mongo'
+with `docker-compose start`. Also make sure to run the stop command in the `docker/prod/mongo`
 directory. To stop and delete the containers, run the script called 'stopProdServerAndDeleteContainers.sh'.
 
 ## Container security hardening
